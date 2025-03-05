@@ -5,7 +5,7 @@ import MoodTracker from "@/components/MoodTracker";
 import JournalEntry from "@/components/JournalEntry";
 import MoodChart from "@/components/MoodChart";
 import ReminderCard from "@/components/ReminderCard";
-import { Bell, Brain, HeartPulse, Sparkles } from "lucide-react";
+import { Bell, Brain, HeartPulse, Sparkles, Wind, BookText } from "lucide-react";
 
 const Index = () => {
   return (
@@ -31,26 +31,30 @@ const Index = () => {
               <ReminderCard
                 title="Breathing Exercise"
                 description="Take 5 minutes to center yourself with deep breathing"
-                icon={<Sparkles className="h-4 w-4" />}
+                icon={<Wind className="h-4 w-4" />}
                 time="5 min"
+                actionPath="/breathing"
               />
               <ReminderCard
                 title="Mindfulness Check"
                 description="Pause and reflect on your present emotions"
                 icon={<Brain className="h-4 w-4" />}
                 time="2 min"
+                actionPath="/mindfulness"
               />
               <ReminderCard
                 title="Daily Reminder"
                 description="Schedule your evening reflection session"
                 icon={<Bell className="h-4 w-4" />}
                 actionText="Set Time"
+                actionPath="/reminders"
               />
               <ReminderCard
                 title="Self Care"
                 description="Remember to prioritize your wellbeing today"
                 icon={<HeartPulse className="h-4 w-4" />}
                 actionText="View Tips"
+                actionPath="/self-care"
               />
             </div>
           </div>

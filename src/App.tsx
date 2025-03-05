@@ -6,7 +6,12 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Index from "./pages/Index";
 import Journal from "./pages/Journal";
+import JournalNew from "./pages/JournalNew";
 import Stats from "./pages/Stats";
+import BreathingExercise from "./pages/BreathingExercise";
+import MindfulnessCheck from "./pages/MindfulnessCheck";
+import DailyReminder from "./pages/DailyReminder";
+import SelfCare from "./pages/SelfCare";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -20,7 +25,12 @@ const App = () => (
         <Routes>
           <Route path="/" element={<Index />} />
           <Route path="/journal" element={<Journal />} />
+          <Route path="/journal/new" element={<JournalNew />} />
           <Route path="/stats" element={<Stats />} />
+          <Route path="/breathing" element={<BreathingExercise />} />
+          <Route path="/mindfulness" element={<MindfulnessCheck />} />
+          <Route path="/reminders" element={<DailyReminder />} />
+          <Route path="/self-care" element={<SelfCare />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>

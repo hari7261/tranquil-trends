@@ -1,5 +1,6 @@
 
 import React from "react";
+import { useNavigate } from "react-router-dom";
 import {
   Card,
   CardContent,
@@ -8,7 +9,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Bell, CheckCircle2, Clock } from "lucide-react";
+import { Clock } from "lucide-react";
 
 interface ReminderCardProps {
   title: string;
@@ -16,6 +17,7 @@ interface ReminderCardProps {
   icon: React.ReactNode;
   time?: string;
   actionText?: string;
+  actionPath?: string;
 }
 
 const ReminderCard = ({
@@ -24,7 +26,16 @@ const ReminderCard = ({
   icon,
   time,
   actionText = "Start Now",
+  actionPath,
 }: ReminderCardProps) => {
+  const navigate = useNavigate();
+
+  const handleAction = () => {
+    if (actionPath) {
+      navigate(actionPath);
+    }
+  };
+
   return (
     <Card className="glass-card-accent overflow-hidden transition-all duration-300 card-hover">
       <CardHeader className="pb-2 flex flex-row items-center justify-between space-y-0">
@@ -41,7 +52,12 @@ const ReminderCard = ({
         )}
       </CardContent>
       <CardFooter className="pt-0">
-        <Button variant="ghost" size="sm" className="w-full text-xs">
+        <Button 
+          variant="ghost" 
+          size="sm" 
+          className="w-full text-xs"
+          onClick={handleAction}
+        >
           {actionText}
         </Button>
       </CardFooter>
