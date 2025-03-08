@@ -1,6 +1,6 @@
 
 import React from "react";
-import { Menu, Moon, Sun, User } from "lucide-react";
+import { Menu, Moon, Sun, User, MessageSquareText } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -8,8 +8,16 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { Link, useLocation } from "react-router-dom";
 
 const Navbar = () => {
+  const location = useLocation();
+  const currentPath = location.pathname;
+
+  const isActivePath = (path: string) => {
+    return currentPath === path;
+  };
+
   return (
     <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/80 backdrop-blur-sm">
       <div className="container flex h-16 items-center">
@@ -19,15 +27,38 @@ const Navbar = () => {
         
         <nav className="ml-auto flex items-center gap-2">
           <div className="hidden md:flex items-center gap-6 px-6">
-            <a href="/" className="text-sm font-medium transition-colors hover:text-primary">
+            <Link 
+              to="/" 
+              className={`text-sm font-medium transition-colors hover:text-primary ${
+                isActivePath("/") ? "text-primary" : "text-muted-foreground"
+              }`}
+            >
               Dashboard
-            </a>
-            <a href="/journal" className="text-sm font-medium text-muted-foreground transition-colors hover:text-primary">
+            </Link>
+            <Link 
+              to="/journal" 
+              className={`text-sm font-medium transition-colors hover:text-primary ${
+                isActivePath("/journal") ? "text-primary" : "text-muted-foreground"
+              }`}
+            >
               Journal
-            </a>
-            <a href="/stats" className="text-sm font-medium text-muted-foreground transition-colors hover:text-primary">
+            </Link>
+            <Link 
+              to="/stats" 
+              className={`text-sm font-medium transition-colors hover:text-primary ${
+                isActivePath("/stats") ? "text-primary" : "text-muted-foreground"
+              }`}
+            >
               Insights
-            </a>
+            </Link>
+            <Link 
+              to="/chatbot" 
+              className={`text-sm font-medium transition-colors hover:text-primary ${
+                isActivePath("/chatbot") ? "text-primary" : "text-muted-foreground"
+              }`}
+            >
+              Assistant
+            </Link>
           </div>
           
           <DropdownMenu>

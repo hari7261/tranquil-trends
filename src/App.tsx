@@ -12,6 +12,7 @@ import BreathingExercise from "./pages/BreathingExercise";
 import MindfulnessCheck from "./pages/MindfulnessCheck";
 import DailyReminder from "./pages/DailyReminder";
 import SelfCare from "./pages/SelfCare";
+import Chatbot from "./pages/Chatbot";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -31,6 +32,7 @@ const App = () => (
           <Route path="/mindfulness" element={<MindfulnessCheck />} />
           <Route path="/reminders" element={<DailyReminder />} />
           <Route path="/self-care" element={<SelfCare />} />
+          <Route path="/chatbot" element={<Chatbot />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
