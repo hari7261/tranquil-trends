@@ -1,0 +1,233 @@
+
+import React, { useState, useEffect, useRef } from "react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import {
+  Card,
+  CardContent,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Avatar } from "@/components/ui/avatar";
+import { Bot, Send, User, X, Maximize2, Minimize2 } from "lucide-react";
+import { toast } from "@/hooks/use-toast";
+
+// Mock responses for the chatbot
+const SAMPLE_RESPONSES = [
+  "I'm here to support you. How can I help with your mental health today?",
+  "It sounds like you're going through a difficult time. Remember that it's okay to feel this way, and seeking help is a sign of strength.",
+  "Have you tried any relaxation techniques, like deep breathing or meditation?",
+  "Your feelings are valid. Would you like to talk more about what's troubling you?",
+  "Consider incorporating small self-care activities into your daily routine. What are some activities you enjoy?",
+  "Remember that progress isn't always linear. Give yourself grace during challenging moments.",
+  "It might be helpful to break down overwhelming tasks into smaller, more manageable steps.",
+  "How have you been sleeping lately? Sleep can significantly impact our mental wellbeing.",
+  "Have you spoken with a mental health professional about these feelings?",
+  "I'm here to listen whenever you need to talk.",
+];
+
+interface Message {
+  text: string;
+  sender: "user" | "bot";
+  timestamp: Date;
+}
+
+interface ChatbotInterfaceProps {
+  initialOpen?: boolean;
+}
+
+const ChatbotInterface: React.FC<ChatbotInterfaceProps> = ({ initialOpen = false }) => {
+  const [isOpen, setIsOpen] = useState(initialOpen);
+  const [messages, setMessages] = useState<Message[]>([
+    {
+      text: "Hi there! I'm your mental health assistant. How can I support you today?",
+      sender: "bot",
+      timestamp: new Date(),
+    },
+  ]);
+  const [inputMessage, setInputMessage] = useState("");
+  const [isProcessing, setIsProcessing] = useState(false);
+  const [isExpanded, setIsExpanded] = useState(false);
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+
+  // Scroll to bottom whenever messages change
+  useEffect(() => {
+    if (messagesEndRef.current) {
+      messagesEndRef.current.scrollIntoView({ behavior: "smooth" });
+    }
+  }, [messages]);
+
+  const handleSendMessage = () => {
+    if (!inputMessage.trim()) return;
+
+    // Add user message
+    const userMessage: Message = {
+      text: inputMessage,
+      sender: "user",
+      timestamp: new Date(),
+    };
+
+    setMessages((prev) => [...prev, userMessage]);
+    setInputMessage("");
+    setIsProcessing(true);
+
+    // Simulate AI processing
+    setTimeout(() => {
+      // In a real app, we would call the Gemini API here
+      const randomResponse = SAMPLE_RESPONSES[Math.floor(Math.random() * SAMPLE_RESPONSES.length)];
+      
+      const botMessage: Message = {
+        text: randomResponse,
+        sender: "bot",
+        timestamp: new Date(),
+      };
+      
+      setMessages((prev) => [...prev, botMessage]);
+      setIsProcessing(false);
+    }, 1500);
+  };
+
+  const handleKeyPress = (e: React.KeyboardEvent) => {
+    if (e.key === "Enter" && !e.shiftKey) {
+      e.preventDefault();
+      handleSendMessage();
+    }
+  };
+
+  const toggleChat = () => {
+    setIsOpen(!isOpen);
+    if (!isOpen) {
+      setIsExpanded(false); // Reset expanded state when opening
+    }
+  };
+
+  const toggleExpand = () => {
+    setIsExpanded(!isExpanded);
+  };
+
+  return (
+    <>
+      {/* Floating button to open chat when closed */}
+      {!isOpen && (
+        <Button
+          onClick={toggleChat}
+          className="fixed bottom-4 right-4 rounded-full h-14 w-14 shadow-lg z-50 flex items-center justify-center"
+        >
+          <Bot className="h-6 w-6" />
+        </Button>
+      )}
+
+      {/* Chat interface */}
+      {isOpen && (
+        <Card
+          className={`fixed ${
+            isExpanded ? "top-4 left-4 right-4 bottom-4" : "bottom-4 right-4 w-80 h-96"
+          } shadow-xl z-50 flex flex-col transition-all duration-300 ease-in-out overflow-hidden`}
+        >
+          <CardHeader className="bg-primary/10 py-3">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <Avatar className="h-8 w-8 bg-primary/20">
+                  <Bot className="h-4 w-4 text-primary" />
+                </Avatar>
+                <CardTitle className="text-base">Mental Health Assistant</CardTitle>
+              </div>
+              <div className="flex items-center gap-1">
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="h-7 w-7"
+                  onClick={toggleExpand}
+                >
+                  {isExpanded ? (
+                    <Minimize2 className="h-4 w-4" />
+                  ) : (
+                    <Maximize2 className="h-4 w-4" />
+                  )}
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="h-7 w-7"
+                  onClick={toggleChat}
+                >
+                  <X className="h-4 w-4" />
+                </Button>
+              </div>
+            </div>
+          </CardHeader>
+          <CardContent className="flex-1 overflow-y-auto p-3 space-y-4">
+            {messages.map((message, index) => (
+              <div
+                key={index}
+                className={`flex ${
+                  message.sender === "user" ? "justify-end" : "justify-start"
+                }`}
+              >
+                <div
+                  className={`max-w-[80%] p-3 rounded-lg ${
+                    message.sender === "user"
+                      ? "bg-primary text-primary-foreground"
+                      : "bg-accent"
+                  }`}
+                >
+                  <div className="flex items-center mb-1 gap-1">
+                    {message.sender === "bot" ? (
+                      <Bot className="h-3 w-3" />
+                    ) : (
+                      <User className="h-3 w-3" />
+                    )}
+                    <span className="text-xs opacity-75">
+                      {message.sender === "user" ? "You" : "Assistant"}
+                    </span>
+                  </div>
+                  <p className="text-sm whitespace-pre-wrap">{message.text}</p>
+                  <p className="text-xs opacity-50 mt-1 text-right">
+                    {new Date(message.timestamp).toLocaleTimeString([], {
+                      hour: "2-digit",
+                      minute: "2-digit",
+                    })}
+                  </p>
+                </div>
+              </div>
+            ))}
+            <div ref={messagesEndRef} />
+            {isProcessing && (
+              <div className="flex justify-start">
+                <div className="bg-accent p-3 rounded-lg max-w-[80%]">
+                  <div className="flex items-center gap-1">
+                    <Bot className="h-3 w-3" />
+                    <div className="ml-2 flex space-x-1">
+                      <div className="h-2 w-2 rounded-full bg-primary animate-bounce" style={{ animationDelay: '0ms' }}></div>
+                      <div className="h-2 w-2 rounded-full bg-primary animate-bounce" style={{ animationDelay: '300ms' }}></div>
+                      <div className="h-2 w-2 rounded-full bg-primary animate-bounce" style={{ animationDelay: '600ms' }}></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+          </CardContent>
+          <CardFooter className="p-3 pt-2 border-t">
+            <div className="flex w-full items-center gap-2">
+              <Input
+                placeholder="Type your message..."
+                value={inputMessage}
+                onChange={(e) => setInputMessage(e.target.value)}
+                onKeyDown={handleKeyPress}
+                className="flex-1"
+                disabled={isProcessing}
+              />
+              <Button onClick={handleSendMessage} disabled={!inputMessage.trim() || isProcessing}>
+                <Send className="h-4 w-4" />
+              </Button>
+            </div>
+          </CardFooter>
+        </Card>
+      )}
+    </>
+  );
+};
+
+export default ChatbotInterface;
