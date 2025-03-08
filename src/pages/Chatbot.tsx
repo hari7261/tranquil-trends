@@ -7,16 +7,17 @@ import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import './chatbot.css';
 
-const FitnessChatbot = () => {
+const MentalHealthChatbot = () => {
   const [input, setInput] = useState('');
   const [messages, setMessages] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [selectedModel, setSelectedModel] = useState('gemini-2.0-flash');
   const [userProfile, setUserProfile] = useState({
-    fitnessLevel: '',
-    fitnessGoals: [],
-    workoutDays: 0,
-    dietaryPreferences: '',
+    mentalState: '',
+    mentalHealthGoals: [],
+    stressLevel: 0,
+    copingMechanisms: [],
+    sleepHours: 0,
     initialized: false
   });
 
@@ -33,7 +34,7 @@ const FitnessChatbot = () => {
       setMessages([
         {
           sender: 'bot',
-          text: "👋 Welcome to FitBot, your personal fitness assistant! I'm here to help you achieve your health and fitness goals. Let me know what you're looking to accomplish - whether it's weight loss, muscle gain, improved endurance, better flexibility, or overall well-being. How can I assist you today?"
+          text: "👋 Welcome to MindTracker, your personal mental health assistant! I'm here to help you monitor and improve your mental wellbeing. Whether you're dealing with stress, anxiety, looking to improve your mood, or just want someone to talk to - I'm here to support you. How are you feeling today?"
         }
       ]);
     }
@@ -139,24 +140,25 @@ const FitnessChatbot = () => {
     );
   };
 
-  // Enhance the user input with fitness context
+  // Enhance the user input with mental health context
   const enhancePrompt = (userInput) => {
-    let systemContext = `You are FitBot, an intelligent fitness assistant that provides personalized guidance on fitness, nutrition, mental health, and overall well-being. Be engaging, motivational, and supportive. Provide evidence-based advice that is practical and actionable. Keep responses concise but informative.`;
+    let systemContext = `You are MindTracker, an intelligent mental health assistant that provides personalized guidance on emotional wellbeing, stress management, anxiety reduction, and overall mental health. Be empathetic, supportive, and understanding. Provide evidence-based advice that is practical and actionable. Keep responses concise but compassionate. Never suggest you are replacing professional mental health care - always recommend seeking professional help for serious concerns.`;
     
     if (userProfile.initialized) {
       systemContext += `\n\nUser Profile:
-- Fitness Level: ${userProfile.fitnessLevel}
-- Fitness Goals: ${userProfile.fitnessGoals.join(', ')}
-- Available Workout Days: ${userProfile.workoutDays} days per week
-- Dietary Preferences: ${userProfile.dietaryPreferences}`;
+- Current Mental State: ${userProfile.mentalState}
+- Mental Health Goals: ${userProfile.mentalHealthGoals.join(', ')}
+- Stress Level (1-10): ${userProfile.stressLevel}
+- Coping Mechanisms: ${userProfile.copingMechanisms.join(', ')}
+- Sleep Hours: ${userProfile.sleepHours} hours/night`;
     }
 
     // Extract conversation history for context
     const conversationHistory = messages.map(msg => 
-      `${msg.sender === 'user' ? 'User' : 'FitBot'}: ${msg.text}`
+      `${msg.sender === 'user' ? 'User' : 'MindTracker'}: ${msg.text}`
     ).join('\n');
 
-    return `${systemContext}\n\nConversation History:\n${conversationHistory}\n\nUser: ${userInput}\n\nFitBot:`;
+    return `${systemContext}\n\nConversation History:\n${conversationHistory}\n\nUser: ${userInput}\n\nMindTracker:`;
   };
 
   const sendMessage = async () => {
@@ -171,7 +173,7 @@ const FitnessChatbot = () => {
       const apiKey = process.env.REACT_APP_GEMINI_API_KEY;
       const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
       
-      // Enhanced prompt with fitness context
+      // Enhanced prompt with mental health context
       const enhancedPrompt = enhancePrompt(input);
       
       const response = await axios.post(
@@ -202,7 +204,7 @@ const FitnessChatbot = () => {
         ...newMessages,
         {
           sender: 'bot',
-          text: 'Sorry, I had trouble connecting to my fitness knowledge base. Please try again in a moment.',
+          text: 'Sorry, I had trouble connecting. Please try again in a moment.',
         },
       ]);
     } finally {
@@ -210,102 +212,134 @@ const FitnessChatbot = () => {
     }
   };
 
-  // Simple function to update user profile based on conversation context
+  // Function to update user profile based on conversation context
   const updateUserProfile = (userInput, botResponse) => {
-    // Only try to initialize profile if not already done
-    if (!userProfile.initialized) {
-      // Check for fitness level indicators
-      if (userInput.toLowerCase().includes('beginner') || 
-          userInput.toLowerCase().includes('new to fitness') ||
-          botResponse.toLowerCase().includes('beginner')) {
-        setUserProfile(prev => ({...prev, fitnessLevel: 'Beginner', initialized: true}));
-      } else if (userInput.toLowerCase().includes('intermediate')) {
-        setUserProfile(prev => ({...prev, fitnessLevel: 'Intermediate', initialized: true}));
-      } else if (userInput.toLowerCase().includes('advanced')) {
-        setUserProfile(prev => ({...prev, fitnessLevel: 'Advanced', initialized: true}));
+    // Only try to initialize profile if not already done or update incrementally
+    const input = userInput.toLowerCase();
+    
+    // Check for mental state indicators
+    const mentalStateKeywords = {
+      'anxious': 'Anxious',
+      'worried': 'Anxious',
+      'stressed': 'Stressed',
+      'overwhelmed': 'Overwhelmed',
+      'sad': 'Sad',
+      'depressed': 'Sad',
+      'happy': 'Happy',
+      'content': 'Content',
+      'calm': 'Calm',
+      'angry': 'Angry',
+      'frustrated': 'Frustrated'
+    };
+    
+    Object.keys(mentalStateKeywords).forEach(keyword => {
+      if (input.includes(keyword)) {
+        setUserProfile(prev => ({...prev, mentalState: mentalStateKeywords[keyword], initialized: true}));
       }
-      
-      // Check for goals
-      const possibleGoals = ['weight loss', 'lose weight', 'build muscle', 'muscle gain', 
-                           'endurance', 'flexibility', 'mental health', 'strength'];
-      const detectedGoals = [];
-      
-      possibleGoals.forEach(goal => {
-        if (userInput.toLowerCase().includes(goal)) {
-          detectedGoals.push(goal);
-        }
-      });
-      
-      if (detectedGoals.length > 0) {
-        setUserProfile(prev => ({...prev, fitnessGoals: detectedGoals, initialized: true}));
+    });
+    
+    // Check for mental health goals
+    const possibleGoals = ['reduce anxiety', 'manage stress', 'improve mood', 'sleep better', 
+                         'mindfulness', 'build resilience', 'reduce negative thoughts'];
+    const detectedGoals = [];
+    
+    possibleGoals.forEach(goal => {
+      if (input.includes(goal)) {
+        detectedGoals.push(goal);
       }
-      
-      // Check for workout days
-      const daysMatch = userInput.match(/(\d+)[\s-]*days?/i);
-      if (daysMatch) {
-        setUserProfile(prev => ({...prev, workoutDays: parseInt(daysMatch[1]), initialized: true}));
+    });
+    
+    if (detectedGoals.length > 0) {
+      setUserProfile(prev => ({...prev, mentalHealthGoals: [...prev.mentalHealthGoals, ...detectedGoals], initialized: true}));
+    }
+    
+    // Check for stress level
+    const stressMatch = input.match(/stress level (?:of |is |at |)(\d+)/i) || 
+                       input.match(/(\d+)(?:\/10)? stress/i);
+    if (stressMatch) {
+      const level = parseInt(stressMatch[1]);
+      if (level >= 0 && level <= 10) {
+        setUserProfile(prev => ({...prev, stressLevel: level, initialized: true}));
       }
-      
-      // Check for dietary preferences
-      const diets = ['vegetarian', 'vegan', 'keto', 'paleo', 'gluten-free', 'dairy-free'];
-      diets.forEach(diet => {
-        if (userInput.toLowerCase().includes(diet)) {
-          setUserProfile(prev => ({...prev, dietaryPreferences: diet, initialized: true}));
-        }
-      });
+    }
+    
+    // Check for coping mechanisms
+    const copingMechanisms = ['meditation', 'exercise', 'reading', 'journaling', 'therapy', 
+                            'breathing exercises', 'yoga', 'talking to friends'];
+    
+    copingMechanisms.forEach(mechanism => {
+      if (input.includes(mechanism)) {
+        setUserProfile(prev => ({
+          ...prev, 
+          copingMechanisms: [...prev.copingMechanisms, mechanism].filter((v, i, a) => a.indexOf(v) === i), 
+          initialized: true
+        }));
+      }
+    });
+    
+    // Check for sleep hours
+    const sleepMatch = input.match(/sleep (?:for |)(\d+)(?: hours| hrs)/i) ||
+                      input.match(/(\d+) hours of sleep/i);
+    if (sleepMatch) {
+      const hours = parseInt(sleepMatch[1]);
+      if (hours > 0 && hours <= 24) {
+        setUserProfile(prev => ({...prev, sleepHours: hours, initialized: true}));
+      }
     }
   };
 
   const clearChat = () => {
     setMessages([{
       sender: 'bot',
-      text: "👋 Welcome back to FitBot! Let's continue working on your fitness journey. How can I help you today?"
+      text: "👋 Welcome back to MindTracker! I'm here to continue supporting your mental health journey. How are you feeling right now?"
     }]);
     setUserProfile({
-      fitnessLevel: '',
-      fitnessGoals: [],
-      workoutDays: 0,
-      dietaryPreferences: '',
+      mentalState: '',
+      mentalHealthGoals: [],
+      stressLevel: 0,
+      copingMechanisms: [],
+      sleepHours: 0,
       initialized: false
     });
   };
 
   const getMotivationalQuote = () => {
     const quotes = [
-      "The only bad workout is the one that didn't happen.",
-      "Your body can stand almost anything. It's your mind you have to convince.",
-      "Fitness is not about being better than someone else. It's about being better than you used to be.",
-      "Take care of your body. It's the only place you have to live.",
-      "The hard part isn't getting your body in shape. The hard part is getting your mind in shape.",
-      "Your health is an investment, not an expense.",
-      "The pain you feel today will be the strength you feel tomorrow."
+      "It's okay not to be okay. It's not okay to stay that way.",
+      "Self-care is how you take your power back.",
+      "You don't have to control your thoughts. You just have to stop letting them control you.",
+      "Your mental health is a priority. Your happiness is essential. Your self-care is a necessity.",
+      "Healing takes time, and asking for help is a courageous step.",
+      "There is hope, even when your brain tells you there isn't.",
+      "Recovery is not one and done. It is one day at a time.",
+      "Be proud of yourself for how hard you're trying."
     ];
     
     const randomIndex = Math.floor(Math.random() * quotes.length);
     
     setMessages([...messages, { 
       sender: 'bot', 
-      text: `💪 *Daily Motivation* 💪\n\n"${quotes[randomIndex]}"` 
+      text: `💭 *Daily Mindfulness* 💭\n\n"${quotes[randomIndex]}"` 
     }]);
   };
 
   return (
-    <div className="chatbot-container fitness-theme">
+    <div className="chatbot-container mental-health-theme">
       {/* Header */}
       <header className="chatbot-header">
-        <h1>FitBot AI</h1>
-        <p>Your personal fitness coach, nutrition guide, and wellness companion</p>
+        <h1>MindTracker AI</h1>
+        <p>Your personal mental health companion, mood tracker, and wellness guide</p>
       </header>
 
       {/* Model info */}
       <div className="model-info-banner">
         <p>Powered by Gemini 2.0 Flash</p>
         <button 
-          className="motivation-button"
+          className="mindfulness-button"
           onClick={getMotivationalQuote}
           disabled={isLoading}
         >
-          Get Motivation
+          Get Mindfulness Quote
         </button>
       </div>
 
@@ -316,7 +350,7 @@ const FitnessChatbot = () => {
         className="chatbot"
       >
         <button className="clear-chat" onClick={clearChat}>
-          Reset FitBot
+          Reset MindTracker
         </button>
 
         <div className="messages">
@@ -330,7 +364,7 @@ const FitnessChatbot = () => {
                 className={`message ${msg.sender}`}
               >
                 <div className="avatar">
-                  {msg.sender === 'user' ? '👤' : '💪'}
+                  {msg.sender === 'user' ? '👤' : '🧠'}
                 </div>
                 <div className="message-content">
                   {formatMessage(msg.text).map((part, i) =>
@@ -353,7 +387,7 @@ const FitnessChatbot = () => {
                 animate={{ opacity: 1 }}
                 className="message bot"
               >
-                <div className="avatar">💪</div>
+                <div className="avatar">🧠</div>
                 <div className="message-content">
                   <TypingAnimation />
                 </div>
@@ -367,7 +401,7 @@ const FitnessChatbot = () => {
             type="text"
             value={input}
             onChange={(e) => setInput(e.target.value)}
-            placeholder="Ask about workouts, nutrition, or wellness..."
+            placeholder="How are you feeling? Share your thoughts..."
             onKeyPress={(e) => e.key === 'Enter' && !isLoading && sendMessage()}
             disabled={isLoading}
           />
@@ -390,23 +424,25 @@ const FitnessChatbot = () => {
           animate={{ opacity: 1, y: 0 }}
           className="user-profile-container"
         >
-          <h3>Your Fitness Profile</h3>
+          <h3>Your Mental Health Profile</h3>
           <div className="profile-details">
-            <p><strong>Level:</strong> {userProfile.fitnessLevel || "Not specified"}</p>
-            <p><strong>Goals:</strong> {userProfile.fitnessGoals.length > 0 ? userProfile.fitnessGoals.join(", ") : "Not specified"}</p>
-            <p><strong>Workout Days:</strong> {userProfile.workoutDays > 0 ? `${userProfile.workoutDays} days/week` : "Not specified"}</p>
-            <p><strong>Diet:</strong> {userProfile.dietaryPreferences || "No restrictions"}</p>
+            <p><strong>Current State:</strong> {userProfile.mentalState || "Not specified"}</p>
+            <p><strong>Goals:</strong> {userProfile.mentalHealthGoals.length > 0 ? userProfile.mentalHealthGoals.join(", ") : "Not specified"}</p>
+            <p><strong>Stress Level:</strong> {userProfile.stressLevel > 0 ? `${userProfile.stressLevel}/10` : "Not specified"}</p>
+            <p><strong>Coping Strategies:</strong> {userProfile.copingMechanisms.length > 0 ? userProfile.copingMechanisms.join(", ") : "Not specified"}</p>
+            {userProfile.sleepHours > 0 && <p><strong>Sleep:</strong> {userProfile.sleepHours} hours/night</p>}
           </div>
         </motion.div>
       )}
 
       {/* Footer */}
       <footer className="chatbot-footer">
-        <p>© 2025 FitBot AI. Your journey to better health.</p>
+        <p>© 2025 MindTracker AI. Supporting your journey to mental wellbeing.</p>
+        <p className="disclaimer">This is not a substitute for professional mental health care. If you're in crisis, please contact a mental health professional or emergency services.</p>
         <p className="model-info">Powered by: Gemini 2.0 Flash</p>
       </footer>
     </div>
   );
 };
 
-export default FitnessChatbot;
+export default MentalHealthChatbot;

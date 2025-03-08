@@ -616,3 +616,34 @@
   button:active {
     transform: scale(0.98);
   }
+
+  .mental-health-theme {
+    --primary-color: #7b68ee; /* A calming purple */
+    --secondary-color: #a3c4bc; /* Soft greenish teal */
+    --accent-color: #9370db; /* Medium purple */
+    --background-color: #f8f8ff; /* Ghost white */
+    --text-color: #444;
+  }
+  
+  .mindfulness-button {
+    background-color: var(--accent-color);
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 20px;
+    cursor: pointer;
+    font-weight: 500;
+    transition: all 0.2s;
+  }
+  
+  .mindfulness-button:hover {
+    background-color: #8a5eda;
+    transform: translateY(-2px);
+  }
+  
+  .disclaimer {
+    font-size: 0.8rem;
+    color: #777;
+    text-align: center;
+    margin-top: 10px;
+  }
