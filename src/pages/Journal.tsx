@@ -1,44 +1,33 @@
 
 import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
 import Layout from "@/components/Layout";
 import { Button } from "@/components/ui/button";
-import { 
-  Card, 
-  CardContent, 
-  CardDescription, 
-  CardFooter, 
-  CardHeader, 
-  CardTitle 
-} from "@/components/ui/card";
-import { 
-  PlusCircle, 
-  BookText, 
-  CalendarDays, 
-  MoreHorizontal,
-  Pencil,
-  Trash2
-} from "lucide-react";
 import {
-  Dialog,
-  DialogContent,
-  DialogTrigger,
-} from "@/components/ui/dialog";
-import JournalEntryForm from "@/components/JournalEntryForm";
-import { format } from "date-fns";
-import { toast } from "@/hooks/use-toast";
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { BookText, Calendar, Plus, Search } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import { Input } from "@/components/ui/input";
+import { Separator } from "@/components/ui/separator";
 
 interface JournalEntry {
   id: string;
   title: string;
   content: string;
   date: string;
+  mood?: string;
+  tags?: string[];
 }
 
 const Journal = () => {
-  const [entries, setEntries] = useState<JournalEntry[]>([]);
-  const [isDialogOpen, setIsDialogOpen] = useState(false);
   const navigate = useNavigate();
+  const [entries, setEntries] = useState<JournalEntry[]>([]);
+  const [searchQuery, setSearchQuery] = useState("");
 
   useEffect(() => {
     // Load entries from localStorage
@@ -48,26 +37,27 @@ const Journal = () => {
     }
   }, []);
 
-  const deleteEntry = (id: string) => {
-    const updatedEntries = entries.filter(entry => entry.id !== id);
-    setEntries(updatedEntries);
-    localStorage.setItem("journalEntries", JSON.stringify(updatedEntries));
-    
-    toast({
-      title: "Entry deleted",
-      description: "Your journal entry has been removed.",
+  const filteredEntries = entries.filter(entry => {
+    const query = searchQuery.toLowerCase();
+    return (
+      entry.title.toLowerCase().includes(query) ||
+      entry.content.toLowerCase().includes(query) ||
+      (entry.tags && entry.tags.some(tag => tag.toLowerCase().includes(query)))
+    );
+  });
+
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString);
+    return date.toLocaleDateString(undefined, {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
     });
   };
 
-  const onDialogOpenChange = (open: boolean) => {
-    setIsDialogOpen(open);
-    if (!open) {
-      // Refresh entries when dialog closes
-      const savedEntries = localStorage.getItem("journalEntries");
-      if (savedEntries) {
-        setEntries(JSON.parse(savedEntries));
-      }
-    }
+  const getExcerpt = (content: string, maxLength = 120) => {
+    if (content.length <= maxLength) return content;
+    return content.substring(0, maxLength) + "...";
   };
 
   return (
@@ -77,84 +67,123 @@ const Journal = () => {
           <div>
             <h1 className="text-3xl font-semibold tracking-tight">Journal</h1>
             <p className="text-muted-foreground mt-1">
-              Track your thoughts and feelings over time
+              Express your thoughts and track your emotional journey
             </p>
           </div>
-          <Dialog open={isDialogOpen} onOpenChange={onDialogOpenChange}>
-            <DialogTrigger asChild>
-              <Button className="flex items-center gap-1">
-                <PlusCircle className="h-4 w-4" />
-                <span>New Entry</span>
-              </Button>
-            </DialogTrigger>
-            <DialogContent className="sm:max-w-[600px] p-0">
-              <JournalEntryForm onClose={() => setIsDialogOpen(false)} isDialog={true} />
-            </DialogContent>
-          </Dialog>
+          <Button onClick={() => navigate("/journal/new")}>
+            <Plus className="mr-2 h-4 w-4" />
+            New Entry
+          </Button>
         </section>
 
-        {entries.length > 0 ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {entries.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()).map((entry) => (
-              <Card key={entry.id} className="glass-card card-hover overflow-hidden">
+        <div className="relative">
+          <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+          <Input
+            placeholder="Search journal entries..."
+            className="pl-10"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+          />
+        </div>
+
+        {entries.length === 0 ? (
+          <Card className="glass-card">
+            <CardContent className="flex flex-col items-center justify-center py-12 text-center">
+              <BookText className="h-12 w-12 text-muted-foreground mb-4" />
+              <h3 className="text-lg font-medium mb-2">Your Journal is Empty</h3>
+              <p className="text-muted-foreground max-w-md mb-6">
+                Start documenting your thoughts, feelings, and experiences to track your mental wellbeing journey.
+              </p>
+              <Button onClick={() => navigate("/journal/new")}>
+                <Plus className="mr-2 h-4 w-4" />
+                Create Your First Entry
+              </Button>
+            </CardContent>
+          </Card>
+        ) : filteredEntries.length === 0 ? (
+          <div className="text-center py-12">
+            <p className="text-muted-foreground">No entries match your search.</p>
+          </div>
+        ) : (
+          <div className="space-y-4">
+            {filteredEntries.map((entry) => (
+              <Card key={entry.id} className="glass-card hover:shadow-md transition-all duration-300">
                 <CardHeader className="pb-2">
-                  <div className="flex justify-between">
-                    <div className="flex items-center gap-2">
-                      <BookText className="w-4 h-4 text-primary" />
-                      <CardTitle className="text-lg font-medium">{entry.title}</CardTitle>
-                    </div>
-                    <div className="flex gap-1">
-                      <Button 
-                        variant="ghost" 
-                        size="icon"
-                        onClick={() => navigate(`/journal/${entry.id}/edit`)}
-                        title="Edit entry"
-                      >
-                        <Pencil className="h-4 w-4" />
-                      </Button>
-                      <Button 
-                        variant="ghost" 
-                        size="icon" 
-                        onClick={() => deleteEntry(entry.id)}
-                        title="Delete entry"
-                      >
-                        <Trash2 className="h-4 w-4 text-destructive" />
-                      </Button>
+                  <div className="flex justify-between items-start">
+                    <CardTitle className="text-lg">{entry.title}</CardTitle>
+                    <div className="flex items-center text-xs text-muted-foreground">
+                      <Calendar className="mr-1 h-3 w-3" />
+                      {formatDate(entry.date)}
                     </div>
                   </div>
-                  <div className="flex items-center text-xs text-muted-foreground mt-1">
-                    <CalendarDays className="mr-1 h-3 w-3" />
-                    <span>{format(new Date(entry.date), "PPP 'at' p")}</span>
-                  </div>
+                  {entry.mood && (
+                    <CardDescription>Mood: {entry.mood}</CardDescription>
+                  )}
                 </CardHeader>
                 <CardContent>
-                  <p className="text-sm line-clamp-3">{entry.content}</p>
+                  <p className="text-muted-foreground">{getExcerpt(entry.content)}</p>
+                  {entry.tags && entry.tags.length > 0 && (
+                    <div className="flex flex-wrap gap-1 mt-3">
+                      {entry.tags.map((tag, index) => (
+                        <span
+                          key={index}
+                          className="inline-flex items-center rounded-full bg-primary/10 px-2 py-0.5 text-xs font-medium text-primary-foreground"
+                        >
+                          {tag}
+                        </span>
+                      ))}
+                    </div>
+                  )}
                 </CardContent>
                 <CardFooter>
-                  <Button variant="ghost" size="sm" className="ml-auto text-xs">
+                  <Button variant="ghost" size="sm" className="ml-auto">
                     Read More
                   </Button>
                 </CardFooter>
               </Card>
             ))}
           </div>
-        ) : (
-          <div className="flex flex-col items-center justify-center py-12 text-center">
-            <div className="bg-primary/10 rounded-full p-6 mb-4">
-              <PlusCircle className="h-10 w-10 text-primary" />
-            </div>
-            <h2 className="text-xl font-medium mb-2">No journal entries yet</h2>
-            <p className="text-muted-foreground max-w-md">
-              Start capturing your thoughts and feelings by creating your first journal entry.
-            </p>
-            <Button 
-              className="mt-6"
-              onClick={() => navigate("/journal/new")}
-            >
-              Create First Entry
-            </Button>
-          </div>
         )}
+
+        <Separator />
+        
+        <section>
+          <h2 className="text-xl font-semibold tracking-tight mb-4">Journaling Benefits</h2>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <Card className="glass-card">
+              <CardHeader className="pb-2">
+                <CardTitle className="text-base">Emotional Processing</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-sm text-muted-foreground">
+                  Writing helps process emotions and make sense of experiences.
+                </p>
+              </CardContent>
+            </Card>
+            
+            <Card className="glass-card">
+              <CardHeader className="pb-2">
+                <CardTitle className="text-base">Pattern Recognition</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-sm text-muted-foreground">
+                  Regular journaling helps identify patterns in your mood and behavior.
+                </p>
+              </CardContent>
+            </Card>
+            
+            <Card className="glass-card">
+              <CardHeader className="pb-2">
+                <CardTitle className="text-base">Stress Reduction</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-sm text-muted-foreground">
+                  Expressing your thoughts on paper can significantly reduce anxiety and stress.
+                </p>
+              </CardContent>
+            </Card>
+          </div>
+        </section>
       </div>
     </Layout>
   );

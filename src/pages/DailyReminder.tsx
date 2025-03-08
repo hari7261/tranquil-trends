@@ -1,188 +1,416 @@
 
 import React, { useState, useEffect } from "react";
 import Layout from "@/components/Layout";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
+import { 
+  Card, 
+  CardContent, 
+  CardDescription, 
+  CardFooter, 
+  CardHeader, 
+  CardTitle 
 } from "@/components/ui/card";
-import { Bell, Check, Trash, Plus } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { ArrowLeft, Bell, Calendar, Clock, Plus, Trash2 } from "lucide-react";
+import { Separator } from "@/components/ui/separator";
+import { useNavigate } from "react-router-dom";
+import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
 import { toast } from "@/hooks/use-toast";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 
 interface Reminder {
   id: string;
+  title: string;
   time: string;
-  text: string;
+  days: string[];
   enabled: boolean;
 }
 
+const daysOfWeek = [
+  { id: "mon", label: "Mon" },
+  { id: "tue", label: "Tue" },
+  { id: "wed", label: "Wed" },
+  { id: "thu", label: "Thu" },
+  { id: "fri", label: "Fri" },
+  { id: "sat", label: "Sat" },
+  { id: "sun", label: "Sun" },
+];
+
 const DailyReminder = () => {
-  const [reminders, setReminders] = useState<Reminder[]>([]);
-  const [newReminderTime, setNewReminderTime] = useState("");
-  const [newReminderText, setNewReminderText] = useState("");
+  const navigate = useNavigate();
+  const [reminders, setReminders] = useState<Reminder[]>(() => {
+    const savedReminders = localStorage.getItem("reminders");
+    return savedReminders ? JSON.parse(savedReminders) : [
+      {
+        id: "1",
+        title: "Morning Mindfulness",
+        time: "08:00",
+        days: ["mon", "tue", "wed", "thu", "fri"],
+        enabled: true
+      },
+      {
+        id: "2",
+        title: "Evening Journal",
+        time: "20:00",
+        days: ["mon", "tue", "wed", "thu", "fri", "sat", "sun"],
+        enabled: true
+      }
+    ];
+  });
+  
+  const [isAddingReminder, setIsAddingReminder] = useState(false);
+  const [newReminder, setNewReminder] = useState<Omit<Reminder, 'id'>>({
+    title: "",
+    time: "",
+    days: [],
+    enabled: true
+  });
 
-  // Load saved reminders from localStorage
+  // Save reminders to localStorage
   useEffect(() => {
-    const savedReminders = localStorage.getItem("dailyReminders");
-    if (savedReminders) {
-      setReminders(JSON.parse(savedReminders));
+    localStorage.setItem("reminders", JSON.stringify(reminders));
+    
+    // Check for permission to show notifications
+    if (Notification.permission !== "granted" && Notification.permission !== "denied") {
+      Notification.requestPermission();
     }
-  }, []);
-
-  // Save reminders to localStorage whenever they change
-  useEffect(() => {
-    localStorage.setItem("dailyReminders", JSON.stringify(reminders));
+    
+    // Update self-care activity if it exists
+    try {
+      const selfCareActivities = localStorage.getItem("selfCareActivities");
+      if (selfCareActivities && reminders.length > 0) {
+        const activities = JSON.parse(selfCareActivities);
+        const updatedActivities = activities.map((activity: any) => {
+          if (activity.title === "Daily Reminder") {
+            return { ...activity, completed: true };
+          }
+          return activity;
+        });
+        localStorage.setItem("selfCareActivities", JSON.stringify(updatedActivities));
+      }
+    } catch (error) {
+      console.error("Error updating self-care activities:", error);
+    }
   }, [reminders]);
 
-  const addReminder = () => {
-    if (!newReminderTime || !newReminderText) {
+  const handleAddReminder = () => {
+    if (!newReminder.title) {
       toast({
-        title: "Missing information",
-        description: "Please provide both a time and description for your reminder.",
+        title: "Title required",
+        description: "Please provide a title for your reminder.",
         variant: "destructive",
       });
       return;
     }
-
-    const newReminder: Reminder = {
+    
+    if (!newReminder.time) {
+      toast({
+        title: "Time required",
+        description: "Please set a time for your reminder.",
+        variant: "destructive",
+      });
+      return;
+    }
+    
+    if (newReminder.days.length === 0) {
+      toast({
+        title: "Days required",
+        description: "Please select at least one day for your reminder.",
+        variant: "destructive",
+      });
+      return;
+    }
+    
+    const reminder: Reminder = {
+      ...newReminder,
       id: Date.now().toString(),
-      time: newReminderTime,
-      text: newReminderText,
-      enabled: true,
     };
-
-    setReminders([...reminders, newReminder]);
-    setNewReminderTime("");
-    setNewReminderText("");
-
+    
+    setReminders([...reminders, reminder]);
+    setNewReminder({
+      title: "",
+      time: "",
+      days: [],
+      enabled: true
+    });
+    setIsAddingReminder(false);
+    
     toast({
-      title: "Reminder added",
-      description: "Your daily reminder has been set.",
+      title: "Reminder created",
+      description: `Your reminder "${reminder.title}" has been created.`,
     });
   };
 
-  const toggleReminder = (id: string) => {
-    setReminders(
-      reminders.map((reminder) =>
-        reminder.id === id
-          ? { ...reminder, enabled: !reminder.enabled }
+  const toggleDay = (day: string) => {
+    setNewReminder(prev => {
+      if (prev.days.includes(day)) {
+        return {
+          ...prev,
+          days: prev.days.filter(d => d !== day)
+        };
+      } else {
+        return {
+          ...prev,
+          days: [...prev.days, day]
+        };
+      }
+    });
+  };
+
+  const toggleReminderEnabled = (id: string) => {
+    setReminders(prev => 
+      prev.map(reminder => 
+        reminder.id === id 
+          ? { ...reminder, enabled: !reminder.enabled } 
           : reminder
       )
     );
   };
 
   const deleteReminder = (id: string) => {
-    setReminders(reminders.filter((reminder) => reminder.id !== id));
+    setReminders(prev => prev.filter(reminder => reminder.id !== id));
     toast({
       title: "Reminder deleted",
       description: "Your reminder has been removed.",
     });
   };
 
+  const formatTime = (time: string) => {
+    try {
+      const [hours, minutes] = time.split(':');
+      const timeObj = new Date();
+      timeObj.setHours(parseInt(hours), parseInt(minutes), 0);
+      return timeObj.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
+    } catch (e) {
+      return time;
+    }
+  };
+
   return (
     <Layout>
       <div className="space-y-6">
-        <section>
-          <h1 className="text-3xl font-semibold tracking-tight">Daily Reminders</h1>
-          <p className="text-muted-foreground mt-1">
-            Set regular reminders to help maintain your mental wellness routine
-          </p>
+        <section className="flex justify-between items-center">
+          <div>
+            <h1 className="text-3xl font-semibold tracking-tight">Daily Reminders</h1>
+            <p className="text-muted-foreground mt-1">
+              Set reminders for your mental health practices
+            </p>
+          </div>
+          <Button variant="outline" onClick={() => navigate(-1)}>
+            <ArrowLeft className="mr-2 h-4 w-4" />
+            Back
+          </Button>
         </section>
 
-        <Card className="glass-card overflow-hidden">
+        <Card className="glass-card-primary overflow-hidden">
           <CardHeader className="pb-3">
-            <CardTitle className="text-lg font-medium flex items-center gap-2">
-              <Bell className="w-5 h-5 text-primary" />
-              Create New Reminder
+            <CardTitle className="text-lg md:text-xl flex items-center gap-2">
+              <Bell className="h-5 w-5 text-primary" />
+              Notifications
             </CardTitle>
             <CardDescription>
-              Add times to be reminded for important wellness activities
+              These reminders help you establish consistent mental health habits
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="flex flex-col sm:flex-row gap-3">
-              <Input
-                type="time"
-                value={newReminderTime}
-                onChange={(e) => setNewReminderTime(e.target.value)}
-                className="border-primary/20 focus-visible:ring-primary/30"
-              />
-              <Input
-                placeholder="Reminder description"
-                value={newReminderText}
-                onChange={(e) => setNewReminderText(e.target.value)}
-                className="flex-grow border-primary/20 focus-visible:ring-primary/30"
-              />
-              <Button 
-                onClick={addReminder}
-                disabled={!newReminderTime || !newReminderText}
-              >
-                <Plus className="h-4 w-4 mr-2" />
-                Add
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
-
-        {reminders.length > 0 ? (
-          <Card className="glass-card overflow-hidden">
-            <CardHeader className="pb-3">
-              <CardTitle className="text-lg font-medium">Your Reminders</CardTitle>
-              <CardDescription>
-                {reminders.filter(r => r.enabled).length} active reminders
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
+            <p className="text-sm text-muted-foreground mb-4">
+              Reminders will be saved in your browser and will show as notifications when the browser is open. For persistent reminders across all devices, consider using your phone's built-in calendar or reminder app.
+            </p>
+            
+            {reminders.length === 0 && (
+              <div className="text-center py-6">
+                <p className="text-muted-foreground mb-4">No reminders set yet</p>
+                <Button 
+                  variant="outline"
+                  onClick={() => setIsAddingReminder(true)}
+                >
+                  <Plus className="mr-2 h-4 w-4" />
+                  Create Your First Reminder
+                </Button>
+              </div>
+            )}
+            
+            {reminders.length > 0 && (
               <div className="space-y-3">
                 {reminders.map((reminder) => (
-                  <div 
-                    key={reminder.id}
-                    className={`flex items-center justify-between p-3 rounded-md border ${
-                      reminder.enabled ? "border-primary/20 bg-primary/5" : "border-muted/30 bg-muted/10"
-                    }`}
-                  >
-                    <div className="flex items-center gap-3">
-                      <div className="font-mono text-sm">
-                        {reminder.time}
+                  <Card key={reminder.id} className={reminder.enabled ? "glass-card" : "bg-muted/50"}>
+                    <CardContent className="p-4 flex justify-between items-center">
+                      <div className="flex items-center gap-4">
+                        <div className={`rounded-full p-2.5 ${reminder.enabled ? "bg-primary/20" : "bg-muted"}`}>
+                          <Bell className={`h-5 w-5 ${reminder.enabled ? "text-primary" : "text-muted-foreground"}`} />
+                        </div>
+                        <div>
+                          <h4 className={`font-medium ${!reminder.enabled && "text-muted-foreground"}`}>{reminder.title}</h4>
+                          <div className="flex items-center text-xs text-muted-foreground gap-3 mt-1">
+                            <div className="flex items-center">
+                              <Clock className="mr-1 h-3 w-3" />
+                              {formatTime(reminder.time)}
+                            </div>
+                            <div className="flex items-center">
+                              <Calendar className="mr-1 h-3 w-3" />
+                              {reminder.days.length === 7 
+                                ? "Every day" 
+                                : reminder.days.map(day => day.charAt(0).toUpperCase()).join(", ")}
+                            </div>
+                          </div>
+                        </div>
                       </div>
-                      <div className={reminder.enabled ? "text-foreground" : "text-muted-foreground line-through"}>
-                        {reminder.text}
+                      <div className="flex items-center gap-1">
+                        <Popover>
+                          <PopoverTrigger asChild>
+                            <Button variant="ghost" size="icon" className="h-8 w-8">
+                              <input 
+                                type="checkbox" 
+                                checked={reminder.enabled}
+                                onChange={() => toggleReminderEnabled(reminder.id)}
+                                className="sr-only"
+                              />
+                              <div className={`w-9 h-5 rounded-full relative ${
+                                reminder.enabled ? "bg-primary" : "bg-muted-foreground/30"
+                              } transition-colors`}>
+                                <div className={`absolute left-0.5 top-0.5 bg-white w-4 h-4 rounded-full transition-transform ${
+                                  reminder.enabled ? "translate-x-4" : ""
+                                }`} />
+                              </div>
+                            </Button>
+                          </PopoverTrigger>
+                          <PopoverContent side="top" className="w-auto p-2">
+                            <p className="text-xs">
+                              {reminder.enabled ? "Disable reminder" : "Enable reminder"}
+                            </p>
+                          </PopoverContent>
+                        </Popover>
+                        
+                        <Popover>
+                          <PopoverTrigger asChild>
+                            <Button 
+                              variant="ghost" 
+                              size="icon"
+                              className="h-8 w-8 text-muted-foreground hover:text-destructive"
+                              onClick={() => deleteReminder(reminder.id)}
+                            >
+                              <Trash2 className="h-4 w-4" />
+                            </Button>
+                          </PopoverTrigger>
+                          <PopoverContent side="top" className="w-auto p-2">
+                            <p className="text-xs">Delete reminder</p>
+                          </PopoverContent>
+                        </Popover>
                       </div>
-                    </div>
-                    <div className="flex gap-1">
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        onClick={() => toggleReminder(reminder.id)}
-                        title={reminder.enabled ? "Disable reminder" : "Enable reminder"}
-                      >
-                        <Check className={`h-4 w-4 ${reminder.enabled ? "text-primary" : "text-muted-foreground"}`} />
-                      </Button>
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        onClick={() => deleteReminder(reminder.id)}
-                        title="Delete reminder"
-                      >
-                        <Trash className="h-4 w-4 text-destructive" />
-                      </Button>
-                    </div>
-                  </div>
+                    </CardContent>
+                  </Card>
                 ))}
               </div>
-            </CardContent>
+            )}
+          </CardContent>
+          {reminders.length > 0 && !isAddingReminder && (
             <CardFooter>
-              <p className="text-xs text-muted-foreground">
-                Note: These reminders will appear as browser notifications when this app is open
-              </p>
+              <Button 
+                className="w-full" 
+                variant="outline"
+                onClick={() => setIsAddingReminder(true)}
+              >
+                <Plus className="mr-2 h-4 w-4" />
+                Add New Reminder
+              </Button>
+            </CardFooter>
+          )}
+        </Card>
+
+        {isAddingReminder && (
+          <Card className="glass-card overflow-hidden">
+            <CardHeader>
+              <CardTitle className="text-base">Create New Reminder</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="title">Reminder Title</Label>
+                <Input 
+                  id="title" 
+                  placeholder="e.g., Evening Meditation" 
+                  value={newReminder.title}
+                  onChange={(e) => setNewReminder({ ...newReminder, title: e.target.value })}
+                />
+              </div>
+              
+              <div className="space-y-2">
+                <Label htmlFor="time">Time</Label>
+                <Input 
+                  id="time" 
+                  type="time" 
+                  value={newReminder.time}
+                  onChange={(e) => setNewReminder({ ...newReminder, time: e.target.value })}
+                />
+              </div>
+              
+              <div className="space-y-2">
+                <Label>Days</Label>
+                <div className="flex flex-wrap gap-2">
+                  {daysOfWeek.map((day) => (
+                    <Button
+                      key={day.id}
+                      variant={newReminder.days.includes(day.id) ? "default" : "outline"}
+                      className="h-10 px-3"
+                      onClick={() => toggleDay(day.id)}
+                      type="button"
+                    >
+                      {day.label}
+                    </Button>
+                  ))}
+                </div>
+              </div>
+            </CardContent>
+            <CardFooter className="flex justify-between">
+              <Button variant="outline" onClick={() => setIsAddingReminder(false)}>
+                Cancel
+              </Button>
+              <Button onClick={handleAddReminder}>
+                Create Reminder
+              </Button>
             </CardFooter>
           </Card>
-        ) : null}
+        )}
+
+        <Separator />
+        
+        <section>
+          <h2 className="text-xl font-semibold tracking-tight mb-4">Why Set Reminders?</h2>
+          
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <Card className="glass-card">
+              <CardHeader className="pb-2">
+                <CardTitle className="text-base">Build Consistency</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-sm text-muted-foreground">
+                  Regular practice is key to seeing benefits from mental health exercises.
+                </p>
+              </CardContent>
+            </Card>
+            
+            <Card className="glass-card">
+              <CardHeader className="pb-2">
+                <CardTitle className="text-base">Reduce Cognitive Load</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-sm text-muted-foreground">
+                  Free up mental space by letting technology remember your self-care schedule.
+                </p>
+              </CardContent>
+            </Card>
+            
+            <Card className="glass-card">
+              <CardHeader className="pb-2">
+                <CardTitle className="text-base">Track Progress</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-sm text-muted-foreground">
+                  Regular reminders help you build a history of your mental health practices.
+                </p>
+              </CardContent>
+            </Card>
+          </div>
+        </section>
       </div>
     </Layout>
   );
