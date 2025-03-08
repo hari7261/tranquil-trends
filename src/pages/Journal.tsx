@@ -14,6 +14,7 @@ import { BookText, Calendar, Plus, Search } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
+import { useSound } from "@/hooks/use-sound";
 
 interface JournalEntry {
   id: string;
@@ -28,6 +29,7 @@ const Journal = () => {
   const navigate = useNavigate();
   const [entries, setEntries] = useState<JournalEntry[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
+  const { playSound } = useSound();
 
   useEffect(() => {
     // Load entries from localStorage
@@ -70,8 +72,15 @@ const Journal = () => {
               Express your thoughts and track your emotional journey
             </p>
           </div>
-          <Button onClick={() => navigate("/journal/new")}>
-            <Plus className="mr-2 h-4 w-4" />
+          <Button 
+            onClick={() => {
+              playSound('click');
+              navigate("/journal/new");
+            }}
+            onMouseEnter={() => playSound('hover')}
+            className="bg-primary hover:bg-primary/90 group"
+          >
+            <Plus className="mr-2 h-4 w-4 group-hover:rotate-90 transition-transform duration-300" />
             New Entry
           </Button>
         </section>
@@ -80,21 +89,28 @@ const Journal = () => {
           <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
           <Input
             placeholder="Search journal entries..."
-            className="pl-10"
+            className="pl-10 bg-background/50"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
           />
         </div>
 
         {entries.length === 0 ? (
-          <Card className="glass-card">
+          <Card className="glass-card animate-breathe">
             <CardContent className="flex flex-col items-center justify-center py-12 text-center">
-              <BookText className="h-12 w-12 text-muted-foreground mb-4" />
+              <BookText className="h-12 w-12 text-secondary mb-4 animate-pulse" />
               <h3 className="text-lg font-medium mb-2">Your Journal is Empty</h3>
               <p className="text-muted-foreground max-w-md mb-6">
                 Start documenting your thoughts, feelings, and experiences to track your mental wellbeing journey.
               </p>
-              <Button onClick={() => navigate("/journal/new")}>
+              <Button 
+                onClick={() => {
+                  playSound('click');
+                  navigate("/journal/new");
+                }}
+                onMouseEnter={() => playSound('hover')}
+                className="bg-primary hover:bg-primary/90"
+              >
                 <Plus className="mr-2 h-4 w-4" />
                 Create Your First Entry
               </Button>
@@ -106,8 +122,12 @@ const Journal = () => {
           </div>
         ) : (
           <div className="space-y-4">
-            {filteredEntries.map((entry) => (
-              <Card key={entry.id} className="glass-card hover:shadow-md transition-all duration-300">
+            {filteredEntries.map((entry, idx) => (
+              <Card 
+                key={entry.id} 
+                className="glass-card card-hover transition-all duration-300"
+                style={{ animationDelay: `${idx * 0.1}s` }}
+              >
                 <CardHeader className="pb-2">
                   <div className="flex justify-between items-start">
                     <CardTitle className="text-lg">{entry.title}</CardTitle>
@@ -127,7 +147,7 @@ const Journal = () => {
                       {entry.tags.map((tag, index) => (
                         <span
                           key={index}
-                          className="inline-flex items-center rounded-full bg-primary/10 px-2 py-0.5 text-xs font-medium text-primary-foreground"
+                          className="inline-flex items-center rounded-full bg-secondary/20 px-2 py-0.5 text-xs font-medium text-secondary-foreground"
                         >
                           {tag}
                         </span>
@@ -136,7 +156,13 @@ const Journal = () => {
                   )}
                 </CardContent>
                 <CardFooter>
-                  <Button variant="ghost" size="sm" className="ml-auto">
+                  <Button 
+                    variant="ghost" 
+                    size="sm" 
+                    className="ml-auto"
+                    onMouseEnter={() => playSound('hover')}
+                    onClick={() => playSound('click')}
+                  >
                     Read More
                   </Button>
                 </CardFooter>
@@ -150,7 +176,7 @@ const Journal = () => {
         <section>
           <h2 className="text-xl font-semibold tracking-tight mb-4">Journaling Benefits</h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <Card className="glass-card">
+            <Card className="glass-card-primary animate-float" style={{ animationDelay: "0s" }}>
               <CardHeader className="pb-2">
                 <CardTitle className="text-base">Emotional Processing</CardTitle>
               </CardHeader>
@@ -161,7 +187,7 @@ const Journal = () => {
               </CardContent>
             </Card>
             
-            <Card className="glass-card">
+            <Card className="glass-card-primary animate-float" style={{ animationDelay: "0.5s" }}>
               <CardHeader className="pb-2">
                 <CardTitle className="text-base">Pattern Recognition</CardTitle>
               </CardHeader>
@@ -172,7 +198,7 @@ const Journal = () => {
               </CardContent>
             </Card>
             
-            <Card className="glass-card">
+            <Card className="glass-card-primary animate-float" style={{ animationDelay: "1s" }}>
               <CardHeader className="pb-2">
                 <CardTitle className="text-base">Stress Reduction</CardTitle>
               </CardHeader>

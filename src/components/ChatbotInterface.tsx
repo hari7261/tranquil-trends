@@ -2,7 +2,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
 import {
   Card,
   CardContent,
@@ -11,8 +10,9 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Avatar } from "@/components/ui/avatar";
-import { Bot, Send, User, X, Maximize2, Minimize2 } from "lucide-react";
+import { Bot, Send, User, X, Maximize2, Minimize2, Volume2, VolumeX } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
+import { useSound } from "@/hooks/use-sound";
 
 // Mock responses for the chatbot
 const SAMPLE_RESPONSES = [
@@ -51,6 +51,7 @@ const ChatbotInterface: React.FC<ChatbotInterfaceProps> = ({ initialOpen = false
   const [isProcessing, setIsProcessing] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const { playSound, toggleSound, isSoundEnabled } = useSound();
 
   // Scroll to bottom whenever messages change
   useEffect(() => {
@@ -61,6 +62,8 @@ const ChatbotInterface: React.FC<ChatbotInterfaceProps> = ({ initialOpen = false
 
   const handleSendMessage = () => {
     if (!inputMessage.trim()) return;
+
+    playSound('click');
 
     // Add user message
     const userMessage: Message = {
@@ -86,6 +89,7 @@ const ChatbotInterface: React.FC<ChatbotInterfaceProps> = ({ initialOpen = false
       
       setMessages((prev) => [...prev, botMessage]);
       setIsProcessing(false);
+      playSound('notification');
     }, 1500);
   };
 
@@ -97,6 +101,7 @@ const ChatbotInterface: React.FC<ChatbotInterfaceProps> = ({ initialOpen = false
   };
 
   const toggleChat = () => {
+    playSound('transition');
     setIsOpen(!isOpen);
     if (!isOpen) {
       setIsExpanded(false); // Reset expanded state when opening
@@ -104,7 +109,16 @@ const ChatbotInterface: React.FC<ChatbotInterfaceProps> = ({ initialOpen = false
   };
 
   const toggleExpand = () => {
+    playSound('click');
     setIsExpanded(!isExpanded);
+  };
+
+  const handleToggleSound = () => {
+    const newSoundState = toggleSound();
+    toast({
+      title: newSoundState ? "Sound effects enabled" : "Sound effects disabled",
+      description: newSoundState ? "You will now hear interactive sounds" : "Sounds are now muted",
+    });
   };
 
   return (
@@ -113,7 +127,8 @@ const ChatbotInterface: React.FC<ChatbotInterfaceProps> = ({ initialOpen = false
       {!isOpen && (
         <Button
           onClick={toggleChat}
-          className="fixed bottom-4 right-4 rounded-full h-14 w-14 shadow-lg z-50 flex items-center justify-center"
+          className="fixed bottom-4 right-4 rounded-full h-14 w-14 shadow-lg z-50 flex items-center justify-center animate-pulse-glow bg-secondary hover:bg-secondary/90"
+          onMouseEnter={() => playSound('hover')}
         >
           <Bot className="h-6 w-6" />
         </Button>
@@ -124,13 +139,13 @@ const ChatbotInterface: React.FC<ChatbotInterfaceProps> = ({ initialOpen = false
         <Card
           className={`fixed ${
             isExpanded ? "top-4 left-4 right-4 bottom-4" : "bottom-4 right-4 w-80 h-96"
-          } shadow-xl z-50 flex flex-col transition-all duration-300 ease-in-out overflow-hidden`}
+          } shadow-xl z-50 flex flex-col transition-all duration-300 ease-in-out overflow-hidden glass-card-accent`}
         >
-          <CardHeader className="bg-primary/10 py-3">
+          <CardHeader className="bg-secondary/20 py-3">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <Avatar className="h-8 w-8 bg-primary/20">
-                  <Bot className="h-4 w-4 text-primary" />
+                <Avatar className="h-8 w-8 bg-secondary/30">
+                  <Bot className="h-4 w-4 text-secondary-foreground" />
                 </Avatar>
                 <CardTitle className="text-base">Mental Health Assistant</CardTitle>
               </div>
@@ -139,7 +154,21 @@ const ChatbotInterface: React.FC<ChatbotInterfaceProps> = ({ initialOpen = false
                   variant="ghost"
                   size="icon"
                   className="h-7 w-7"
+                  onClick={handleToggleSound}
+                  onMouseEnter={() => playSound('hover')}
+                >
+                  {isSoundEnabled() ? (
+                    <Volume2 className="h-4 w-4" />
+                  ) : (
+                    <VolumeX className="h-4 w-4" />
+                  )}
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="h-7 w-7"
                   onClick={toggleExpand}
+                  onMouseEnter={() => playSound('hover')}
                 >
                   {isExpanded ? (
                     <Minimize2 className="h-4 w-4" />
@@ -152,6 +181,7 @@ const ChatbotInterface: React.FC<ChatbotInterfaceProps> = ({ initialOpen = false
                   size="icon"
                   className="h-7 w-7"
                   onClick={toggleChat}
+                  onMouseEnter={() => playSound('hover')}
                 >
                   <X className="h-4 w-4" />
                 </Button>
@@ -169,8 +199,8 @@ const ChatbotInterface: React.FC<ChatbotInterfaceProps> = ({ initialOpen = false
                 <div
                   className={`max-w-[80%] p-3 rounded-lg ${
                     message.sender === "user"
-                      ? "bg-primary text-primary-foreground"
-                      : "bg-accent"
+                      ? "bg-primary text-primary-foreground animate-slide-in"
+                      : "bg-secondary/20 animate-fade-in"
                   }`}
                 >
                   <div className="flex items-center mb-1 gap-1">
@@ -196,30 +226,35 @@ const ChatbotInterface: React.FC<ChatbotInterfaceProps> = ({ initialOpen = false
             <div ref={messagesEndRef} />
             {isProcessing && (
               <div className="flex justify-start">
-                <div className="bg-accent p-3 rounded-lg max-w-[80%]">
+                <div className="bg-secondary/20 p-3 rounded-lg max-w-[80%]">
                   <div className="flex items-center gap-1">
                     <Bot className="h-3 w-3" />
                     <div className="ml-2 flex space-x-1">
-                      <div className="h-2 w-2 rounded-full bg-primary animate-bounce" style={{ animationDelay: '0ms' }}></div>
-                      <div className="h-2 w-2 rounded-full bg-primary animate-bounce" style={{ animationDelay: '300ms' }}></div>
-                      <div className="h-2 w-2 rounded-full bg-primary animate-bounce" style={{ animationDelay: '600ms' }}></div>
+                      <div className="h-2 w-2 rounded-full bg-secondary animate-bounce" style={{ animationDelay: '0ms' }}></div>
+                      <div className="h-2 w-2 rounded-full bg-secondary animate-bounce" style={{ animationDelay: '300ms' }}></div>
+                      <div className="h-2 w-2 rounded-full bg-secondary animate-bounce" style={{ animationDelay: '600ms' }}></div>
                     </div>
                   </div>
                 </div>
               </div>
             )}
           </CardContent>
-          <CardFooter className="p-3 pt-2 border-t">
+          <CardFooter className="p-3 pt-2 border-t border-accent/20">
             <div className="flex w-full items-center gap-2">
               <Input
                 placeholder="Type your message..."
                 value={inputMessage}
                 onChange={(e) => setInputMessage(e.target.value)}
                 onKeyDown={handleKeyPress}
-                className="flex-1"
+                className="flex-1 bg-background/50"
                 disabled={isProcessing}
               />
-              <Button onClick={handleSendMessage} disabled={!inputMessage.trim() || isProcessing}>
+              <Button 
+                onClick={handleSendMessage} 
+                disabled={!inputMessage.trim() || isProcessing}
+                onMouseEnter={() => playSound('hover')}
+                className="bg-primary hover:bg-primary/90"
+              >
                 <Send className="h-4 w-4" />
               </Button>
             </div>

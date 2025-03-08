@@ -64,17 +64,30 @@ export default {
           ring: "hsl(var(--sidebar-ring))"
         },
         mental: {
-          50: "#f0f7ff",
-          100: "#d6e8fa",
-          200: "#b4d3f5",
-          300: "#85b8ed",
-          400: "#5093e1",
-          500: "#2f74d4",
-          600: "#215db5",
-          700: "#1d4b93",
-          800: "#1c4079",
-          900: "#1c3a65",
-          950: "#142544",
+          50: "#E9F5EF",
+          100: "#C6E6D6",
+          200: "#A2D6BC",
+          300: "#7FC6A2",
+          400: "#5BB88F",
+          500: "#41A97D",
+          600: "#379A6F",
+          700: "#2D8A5F",
+          800: "#247A4F",
+          900: "#165C37",
+          950: "#0D422B",
+        },
+        purple: {
+          50: "#F5EEFF",
+          100: "#E9DCFF",
+          200: "#D3B9FF",
+          300: "#B895FF",
+          400: "#A272FF",
+          500: "#8B5CF6",
+          600: "#7944EF",
+          700: "#652BDD",
+          800: "#5423B8",
+          900: "#441F94",
+          950: "#2E0F6B",
         }
       },
       borderRadius: {
@@ -114,6 +127,18 @@ export default {
         "pulse-subtle": {
           "0%, 100%": { opacity: "1" },
           "50%": { opacity: "0.8" }
+        },
+        "glow": {
+          "0%, 100%": { boxShadow: "0 0 5px rgba(139, 92, 246, 0.5)" },
+          "50%": { boxShadow: "0 0 20px rgba(139, 92, 246, 0.8)" }
+        },
+        "float": {
+          "0%, 100%": { transform: "translateY(0)" },
+          "50%": { transform: "translateY(-10px)" }
+        },
+        "breathe": {
+          "0%, 100%": { transform: "scale(1)" },
+          "50%": { transform: "scale(1.03)" }
         }
       },
       animation: {
@@ -126,9 +151,16 @@ export default {
         "slide-in": "slide-in 0.4s ease-out",
         "pulse-subtle": "pulse-subtle 3s ease-in-out infinite",
         "enter": "fade-in 0.4s ease-out, scale-in 0.3s ease-out",
+        "glow": "glow 3s ease-in-out infinite",
+        "float": "float 6s ease-in-out infinite",
+        "breathe": "breathe 8s ease-in-out infinite"
       },
       backdropBlur: {
         xs: '2px',
+      },
+      backgroundImage: {
+        'gradient-radial': 'radial-gradient(circle, var(--tw-gradient-stops))',
+        'gradient-conic': 'conic-gradient(from 180deg at 50% 50%, var(--tw-gradient-stops))',
       },
     },
   },

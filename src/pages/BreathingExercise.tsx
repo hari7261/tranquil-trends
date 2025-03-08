@@ -14,6 +14,7 @@ import { ArrowLeft, Play, Pause, RefreshCw, Volume2, VolumeX } from "lucide-reac
 import { Separator } from "@/components/ui/separator";
 import { useNavigate } from "react-router-dom";
 import { toast } from "@/hooks/use-toast";
+import { useSound } from "@/hooks/use-sound";
 
 const INHALE_TIME = 4; // seconds
 const HOLD_TIME = 7; // seconds
@@ -33,6 +34,7 @@ const BreathingExercise = () => {
   
   const circleRef = useRef<HTMLDivElement>(null);
   const audioRef = useRef<HTMLAudioElement>(null);
+  const { playSound } = useSound();
 
   // Initialize audio
   useEffect(() => {
@@ -61,6 +63,7 @@ const BreathingExercise = () => {
                   audioRef.current.currentTime = 0;
                   audioRef.current.play();
                 }
+                playSound('transition');
                 break;
               case "hold":
                 nextPhase = "exhale";
@@ -69,6 +72,7 @@ const BreathingExercise = () => {
                   audioRef.current.currentTime = 0;
                   audioRef.current.play();
                 }
+                playSound('transition');
                 break;
               case "exhale":
                 nextPhase = "pause";
@@ -77,11 +81,13 @@ const BreathingExercise = () => {
                   audioRef.current.currentTime = 0;
                   audioRef.current.play();
                 }
+                playSound('transition');
                 break;
               case "pause":
                 nextPhase = "inhale";
                 nextTime = INHALE_TIME;
                 setCompletedCycles(prev => prev + 1);
+                playSound('complete');
                 break;
               default:
                 nextPhase = "inhale";
@@ -101,7 +107,7 @@ const BreathingExercise = () => {
         clearInterval(interval);
       }
     };
-  }, [isActive, currentPhase, soundEnabled]);
+  }, [isActive, currentPhase, soundEnabled, playSound]);
 
   // Check if we've completed all cycles
   useEffect(() => {
@@ -111,6 +117,8 @@ const BreathingExercise = () => {
         title: "Exercise Complete!",
         description: `You've completed ${targetCycles} breathing cycles. Great job!`,
       });
+      
+      playSound('success');
       
       // Save the activity completion to localStorage
       try {
@@ -129,7 +137,7 @@ const BreathingExercise = () => {
         console.error("Error updating self-care activities:", error);
       }
     }
-  }, [completedCycles, targetCycles, isActive]);
+  }, [completedCycles, targetCycles, isActive, playSound]);
 
   // Animation for the breathing circle
   useEffect(() => {
@@ -140,19 +148,24 @@ const BreathingExercise = () => {
     if (currentPhase === "inhale") {
       circle.style.transform = "scale(1.5)";
       circle.style.transition = `transform ${INHALE_TIME}s ease-in-out`;
+      circle.style.boxShadow = "0 0 30px rgba(139, 92, 246, 0.5)";
     } else if (currentPhase === "hold") {
       circle.style.transform = "scale(1.5)";
       circle.style.transition = "none";
+      circle.style.boxShadow = "0 0 40px rgba(139, 92, 246, 0.7)";
     } else if (currentPhase === "exhale") {
       circle.style.transform = "scale(1)";
       circle.style.transition = `transform ${EXHALE_TIME}s ease-in-out`;
+      circle.style.boxShadow = "0 0 20px rgba(139, 92, 246, 0.3)";
     } else {
       circle.style.transform = "scale(1)";
       circle.style.transition = "none";
+      circle.style.boxShadow = "0 0 10px rgba(139, 92, 246, 0.2)";
     }
   }, [currentPhase]);
 
   const toggleActive = () => {
+    playSound('click');
     if (!isActive && completedCycles >= targetCycles) {
       // Reset if we're starting again after completing all cycles
       setCompletedCycles(0);
@@ -161,6 +174,7 @@ const BreathingExercise = () => {
   };
 
   const resetExercise = () => {
+    playSound('click');
     setIsActive(false);
     setCurrentPhase("inhale");
     setTimeLeft(INHALE_TIME);
@@ -169,6 +183,7 @@ const BreathingExercise = () => {
 
   const toggleSound = () => {
     setSoundEnabled(!soundEnabled);
+    playSound('click');
   };
 
   const getPhaseText = () => {
@@ -201,13 +216,20 @@ const BreathingExercise = () => {
               4-7-8 breathing technique for relaxation and stress reduction
             </p>
           </div>
-          <Button variant="outline" onClick={() => navigate(-1)}>
+          <Button 
+            variant="outline" 
+            onClick={() => {
+              playSound('click');
+              navigate(-1);
+            }}
+            onMouseEnter={() => playSound('hover')}
+          >
             <ArrowLeft className="mr-2 h-4 w-4" />
             Back
           </Button>
         </section>
 
-        <Card className="glass-card overflow-hidden">
+        <Card className="glass-card-accent overflow-hidden animate-breathe">
           <CardHeader className="pb-3">
             <CardTitle className="text-lg md:text-xl">Guided Breathing</CardTitle>
             <CardDescription>Follow the animation and instructions</CardDescription>
@@ -216,7 +238,7 @@ const BreathingExercise = () => {
             <div className="relative flex items-center justify-center w-48 h-48 mb-8">
               <div
                 ref={circleRef}
-                className="absolute w-32 h-32 bg-primary/20 backdrop-blur-lg rounded-full"
+                className="absolute w-32 h-32 bg-secondary/30 backdrop-blur-lg rounded-full transition-all"
               ></div>
               <div className="absolute pointer-events-none flex flex-col items-center justify-center text-center z-10">
                 <h3 className="text-2xl font-bold mb-1">{getPhaseText()}</h3>
@@ -233,7 +255,7 @@ const BreathingExercise = () => {
                   <div 
                     key={index}
                     className={`w-6 h-2 rounded-full ${
-                      index < completedCycles ? 'bg-primary' : 'bg-muted'
+                      index < completedCycles ? 'bg-primary animate-pulse' : 'bg-muted'
                     }`}
                   ></div>
                 ))}
@@ -245,6 +267,7 @@ const BreathingExercise = () => {
                 onClick={toggleActive} 
                 className="w-32"
                 variant={isActive ? "outline" : "default"}
+                onMouseEnter={() => playSound('hover')}
               >
                 {isActive ? (
                   <>
@@ -259,11 +282,21 @@ const BreathingExercise = () => {
                 )}
               </Button>
               
-              <Button variant="ghost" size="icon" onClick={resetExercise}>
+              <Button 
+                variant="ghost" 
+                size="icon" 
+                onClick={resetExercise}
+                onMouseEnter={() => playSound('hover')}
+              >
                 <RefreshCw className="h-4 w-4" />
               </Button>
               
-              <Button variant="ghost" size="icon" onClick={toggleSound}>
+              <Button 
+                variant="ghost" 
+                size="icon" 
+                onClick={toggleSound}
+                onMouseEnter={() => playSound('hover')}
+              >
                 {soundEnabled ? (
                   <Volume2 className="h-4 w-4" />
                 ) : (
@@ -280,7 +313,7 @@ const BreathingExercise = () => {
           <h2 className="text-xl font-semibold tracking-tight">Benefits of 4-7-8 Breathing</h2>
           
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <Card className="glass-card">
+            <Card className="glass-card animate-float card-hover">
               <CardHeader className="pb-2">
                 <CardTitle className="text-base">Reduces Anxiety</CardTitle>
               </CardHeader>
@@ -291,7 +324,7 @@ const BreathingExercise = () => {
               </CardContent>
             </Card>
             
-            <Card className="glass-card">
+            <Card className="glass-card animate-float card-hover" style={{ animationDelay: "1s" }}>
               <CardHeader className="pb-2">
                 <CardTitle className="text-base">Improves Sleep</CardTitle>
               </CardHeader>
@@ -302,7 +335,7 @@ const BreathingExercise = () => {
               </CardContent>
             </Card>
             
-            <Card className="glass-card">
+            <Card className="glass-card animate-float card-hover" style={{ animationDelay: "2s" }}>
               <CardHeader className="pb-2">
                 <CardTitle className="text-base">Enhances Focus</CardTitle>
               </CardHeader>
