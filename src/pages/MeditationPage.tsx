@@ -40,7 +40,7 @@ import {
 } from "@/services/localStorage";
 import { PieChart, Pie, Cell, ResponsiveContainer, LineChart, Line, XAxis, YAxis, Tooltip, BarChart, Bar } from "recharts";
 
-// Define meditation tracks with the new music
+// Define meditation tracks with working audio URLs
 const meditationTracks = [
   {
     id: "weightless",
@@ -50,7 +50,7 @@ const meditationTracks = [
     type: "ambient",
     time: "8 min",
     icon: <MoonStar className="h-5 w-5" />,
-    audio: "https://cdn.trendybeatz.com/audio/Marconi-Union-Weightless-(TrendyBeatz.com).mp3"
+    audio: "https://dl.sndup.net/mz45/Marconi%20Union%20-%20Weightless.mp3"
   },
   {
     id: "longing-to-belong",
@@ -70,7 +70,7 @@ const meditationTracks = [
     type: "guided",
     time: "10 min",
     icon: <Wind className="h-5 w-5" />,
-    audio: "https://dl.sndup.net/r75n/Deuter%20-%20Meditations%20for%20Inner%20Peace.mp3"
+    audio: "https://dl.sndup.net/b9f4/Deuter%20-%20Meditations%20for%20Inner%20Peace.mp3"
   },
   {
     id: "om-namah-shivaya",
@@ -100,7 +100,7 @@ const meditationTracks = [
     type: "ambient",
     time: "9 min",
     icon: <Leaf className="h-5 w-5" />,
-    audio: "https://dl.sndup.net/wq4k/Sandeep%20Khurana%20-%20Ethereal%20Buddha%20Vibes.mp3"
+    audio: "https://dl.sndup.net/fwjz/Sandeep%20Khurana%20-%20Ethereal%20Buddha%20Vibes.mp3"
   },
   {
     id: "stay",
