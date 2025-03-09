@@ -4,13 +4,13 @@ import { useCallback, useEffect, useRef } from 'react';
 type SoundType = 'click' | 'success' | 'error' | 'notification' | 'hover' | 'transition' | 'complete';
 
 const soundFiles = {
-  click: 'https://assets.mixkit.co/active_storage/sfx/212/212-preview.mp3',
-  success: 'https://assets.mixkit.co/active_storage/sfx/270/270-preview.mp3',
-  error: 'https://assets.mixkit.co/active_storage/sfx/249/249-preview.mp3',
-  notification: 'https://assets.mixkit.co/active_storage/sfx/1339/1339-preview.mp3',
-  hover: 'https://assets.mixkit.co/active_storage/sfx/238/238-preview.mp3',
-  transition: 'https://assets.mixkit.co/active_storage/sfx/220/220-preview.mp3',
-  complete: 'https://assets.mixkit.co/active_storage/sfx/1008/1008-preview.mp3'
+  click: 'https://assets.mixkit.co/active_storage/sfx/2013/2013-preview.mp3',
+  success: 'https://assets.mixkit.co/active_storage/sfx/2018/2018-preview.mp3',
+  error: 'https://assets.mixkit.co/active_storage/sfx/2940/2940-preview.mp3',
+  notification: 'https://assets.mixkit.co/active_storage/sfx/2019/2019-preview.mp3',
+  hover: 'https://assets.mixkit.co/active_storage/sfx/1380/1380-preview.mp3',
+  transition: 'https://assets.mixkit.co/active_storage/sfx/2015/2015-preview.mp3',
+  complete: 'https://assets.mixkit.co/active_storage/sfx/2017/2017-preview.mp3'
 };
 
 export const useSound = () => {
