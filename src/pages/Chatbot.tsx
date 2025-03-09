@@ -21,6 +21,7 @@ const Chatbot = () => {
 
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
           <div className="lg:col-span-3 order-2 lg:order-1">
+            {/* Fixed height container with stable UI */}
             <Card className="overflow-hidden border-2 border-secondary/10 bg-card/50 backdrop-blur-sm h-[700px]">
               <CardHeader className="bg-secondary/5 border-b border-secondary/10 pb-4">
                 <CardTitle className="flex items-center gap-2">
