@@ -11,6 +11,9 @@ import {
 } from "@/components/ui/card";
 import { Smile, Meh, Frown, Heart, Angry } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { saveMoodEntry } from "@/services/localStorage";
+import { toast } from "@/hooks/use-toast";
+import { useSound } from "@/hooks/use-sound";
 
 type Mood = "great" | "good" | "okay" | "bad" | "awful";
 
@@ -22,12 +25,22 @@ const moodEmojis = {
   awful: { icon: Angry, color: "text-red-500", bg: "bg-red-100" },
 };
 
+const moodValues = {
+  great: 5,
+  good: 4,
+  okay: 3,
+  bad: 2,
+  awful: 1,
+};
+
 const MoodTracker = () => {
   const [selectedMood, setSelectedMood] = useState<Mood | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
+  const { playSound } = useSound();
 
   const handleMoodSelect = (mood: Mood) => {
+    playSound("click");
     setSelectedMood(mood);
   };
 
@@ -35,10 +48,20 @@ const MoodTracker = () => {
     if (!selectedMood) return;
     
     setSubmitting(true);
-    // Simulate API call
+    playSound("transition");
+    
+    // Save to localStorage
+    const moodValue = moodValues[selectedMood];
+    saveMoodEntry(moodValue, selectedMood);
+    
     setTimeout(() => {
       setSubmitting(false);
       setSubmitted(true);
+      
+      toast({
+        title: "Mood recorded",
+        description: `We've saved your ${selectedMood} mood for today.`,
+      });
       
       // Reset after showing success
       setTimeout(() => {

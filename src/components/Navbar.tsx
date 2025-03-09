@@ -1,6 +1,5 @@
-
 import React, { useState } from "react";
-import { Menu, User, MessageSquareText, X } from "lucide-react";
+import { Menu, User, MessageSquareText, X, Waves } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -27,6 +26,14 @@ const Navbar = () => {
     setIsMenuOpen(false);
   };
 
+  const navigationItems = [
+    { name: "Dashboard", path: "/", icon: <Home className="w-5 h-5" /> },
+    { name: "Journal", path: "/journal", icon: <PenSquare className="w-5 h-5" /> },
+    { name: "Stats", path: "/stats", icon: <BarChart2 className="w-5 h-5" /> },
+    { name: "Chatbot", path: "/chatbot", icon: <MessageSquareText className="w-5 h-5" /> },
+    { name: "Meditation", path: "/meditation", icon: <Waves className="w-5 h-5" /> },
+  ];
+
   return (
     <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/80 backdrop-blur-sm">
       <div className="container flex h-16 items-center">
@@ -36,42 +43,19 @@ const Navbar = () => {
         
         <nav className="ml-auto flex items-center gap-2">
           <div className="hidden md:flex items-center gap-6 px-6">
-            <Link 
-              to="/" 
-              className={`text-sm font-medium transition-colors hover:text-primary ${
-                isActivePath("/") ? "text-primary" : "text-muted-foreground"
-              }`}
-              onMouseEnter={() => playSound('hover')}
-            >
-              Dashboard
-            </Link>
-            <Link 
-              to="/journal" 
-              className={`text-sm font-medium transition-colors hover:text-primary ${
-                isActivePath("/journal") ? "text-primary" : "text-muted-foreground"
-              }`}
-              onMouseEnter={() => playSound('hover')}
-            >
-              Journal
-            </Link>
-            <Link 
-              to="/stats" 
-              className={`text-sm font-medium transition-colors hover:text-primary ${
-                isActivePath("/stats") ? "text-primary" : "text-muted-foreground"
-              }`}
-              onMouseEnter={() => playSound('hover')}
-            >
-              Insights
-            </Link>
-            <Link 
-              to="/chatbot" 
-              className={`text-sm font-medium transition-colors hover:text-primary ${
-                isActivePath("/chatbot") ? "text-primary" : "text-muted-foreground"
-              }`}
-              onMouseEnter={() => playSound('hover')}
-            >
-              Assistant
-            </Link>
+            {navigationItems.map((item) => (
+              <Link 
+                key={item.name} 
+                to={item.path} 
+                className={`text-sm font-medium transition-colors hover:text-primary ${
+                  isActivePath(item.path) ? "text-primary" : "text-muted-foreground"
+                }`}
+                onMouseEnter={() => playSound('hover')}
+              >
+                {item.icon}
+                {item.name}
+              </Link>
+            ))}
           </div>
           
           <DropdownMenu>
@@ -110,42 +94,19 @@ const Navbar = () => {
             <SheetContent side="right" className="w-[250px] sm:w-[300px]">
               <div className="py-4">
                 <div className="flex flex-col space-y-4 mt-6">
-                  <Link 
-                    to="/" 
-                    className={`flex items-center px-2 py-2 rounded-md hover:bg-accent ${
-                      isActivePath("/") ? "bg-accent/50 text-primary" : "text-muted-foreground"
-                    }`}
-                    onClick={handleMenuItemClick}
-                  >
-                    Dashboard
-                  </Link>
-                  <Link 
-                    to="/journal" 
-                    className={`flex items-center px-2 py-2 rounded-md hover:bg-accent ${
-                      isActivePath("/journal") ? "bg-accent/50 text-primary" : "text-muted-foreground"
-                    }`}
-                    onClick={handleMenuItemClick}
-                  >
-                    Journal
-                  </Link>
-                  <Link 
-                    to="/stats" 
-                    className={`flex items-center px-2 py-2 rounded-md hover:bg-accent ${
-                      isActivePath("/stats") ? "bg-accent/50 text-primary" : "text-muted-foreground"
-                    }`}
-                    onClick={handleMenuItemClick}
-                  >
-                    Insights
-                  </Link>
-                  <Link 
-                    to="/chatbot" 
-                    className={`flex items-center px-2 py-2 rounded-md hover:bg-accent ${
-                      isActivePath("/chatbot") ? "bg-accent/50 text-primary" : "text-muted-foreground"
-                    }`}
-                    onClick={handleMenuItemClick}
-                  >
-                    Assistant
-                  </Link>
+                  {navigationItems.map((item) => (
+                    <Link 
+                      key={item.name} 
+                      to={item.path} 
+                      className={`flex items-center px-2 py-2 rounded-md hover:bg-accent ${
+                        isActivePath(item.path) ? "bg-accent/50 text-primary" : "text-muted-foreground"
+                      }`}
+                      onClick={handleMenuItemClick}
+                    >
+                      {item.icon}
+                      {item.name}
+                    </Link>
+                  ))}
                 </div>
               </div>
             </SheetContent>

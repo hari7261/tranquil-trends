@@ -1,5 +1,5 @@
 
-import React from "react";
+import React, { useState, useEffect } from "react";
 import {
   Card,
   CardContent,
@@ -8,23 +8,21 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer } from "recharts";
+import { getMoodEntries, MoodEntry } from "@/services/localStorage";
 
-// Mock data
-const moodData = [
-  { day: "Mon", value: 3, mood: "okay" },
-  { day: "Tue", value: 4, mood: "good" },
-  { day: "Wed", value: 2, mood: "bad" },
-  { day: "Thu", value: 5, mood: "great" },
-  { day: "Fri", value: 4, mood: "good" },
-  { day: "Sat", value: 3, mood: "okay" },
-  { day: "Sun", value: 4, mood: "good" },
-];
+interface ChartDataPoint {
+  day: string;
+  value: number;
+  mood: string;
+  date: string;
+}
 
 const CustomTooltip = ({ active, payload, label }: any) => {
   if (active && payload && payload.length) {
     return (
       <div className="glass-card !bg-white/90 p-2 text-xs border rounded-lg shadow-sm">
         <p className="font-medium">{`${label} : ${payload[0].payload.mood}`}</p>
+        <p className="text-muted-foreground">{new Date(payload[0].payload.date).toLocaleDateString()}</p>
       </div>
     );
   }
@@ -33,6 +31,40 @@ const CustomTooltip = ({ active, payload, label }: any) => {
 };
 
 const MoodChart = () => {
+  const [moodData, setMoodData] = useState<ChartDataPoint[]>([]);
+
+  useEffect(() => {
+    // Load mood data from localStorage
+    const entries = getMoodEntries();
+    
+    if (entries.length > 0) {
+      // Get the last 7 entries
+      const recentEntries = entries.slice(-7);
+      
+      // Format for chart display
+      const chartData = recentEntries.map((entry: MoodEntry) => ({
+        day: new Date(entry.date).toLocaleDateString(undefined, { weekday: 'short' }),
+        value: entry.value,
+        mood: entry.mood,
+        date: entry.date
+      }));
+      
+      setMoodData(chartData);
+    } else {
+      // Fallback mock data if no entries exist
+      const mockData = [
+        { day: "Mon", value: 3, mood: "okay", date: new Date().toISOString() },
+        { day: "Tue", value: 4, mood: "good", date: new Date().toISOString() },
+        { day: "Wed", value: 2, mood: "bad", date: new Date().toISOString() },
+        { day: "Thu", value: 5, mood: "great", date: new Date().toISOString() },
+        { day: "Fri", value: 4, mood: "good", date: new Date().toISOString() },
+        { day: "Sat", value: 3, mood: "okay", date: new Date().toISOString() },
+        { day: "Sun", value: 4, mood: "good", date: new Date().toISOString() },
+      ];
+      setMoodData(mockData);
+    }
+  }, []);
+
   return (
     <Card className="glass-card h-full overflow-hidden transition-all duration-300">
       <CardHeader className="pb-3">
