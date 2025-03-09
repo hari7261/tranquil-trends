@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useRef } from "react";
 import Layout from "@/components/Layout";
 import { Button } from "@/components/ui/button";
@@ -39,108 +38,130 @@ import {
   getMeditationStreak
 } from "@/services/localStorage";
 import { PieChart, Pie, Cell, ResponsiveContainer, LineChart, Line, XAxis, YAxis, Tooltip, BarChart, Bar } from "recharts";
+import song1 from "@/../public/music/ethereal-electronic-01-263925.mp3";
+import song2 from "@/../public/music/mixkit-relaxation-meditation-365.mp3";
+import song3 from "@/../public/music/mixkit-serene-view-443 (1).mp3";
+import song4 from "@/../public/music/mixkit-smooth-meditation-324.mp3";
+import song5 from "@/../public/music/mixkit-spiritual-moment-525.mp3";
+import song6 from "@/../public/music/mixkit-valley-sunset-127.mp3";
+import song7 from "@/../public/music/mixkit-yoga-music-04-386.mp3";
+import song8 from "@/../public/music/om-namah-shivaya-song-229613.mp3";
+import song9 from "@/../public/music/soft-drum-and-bass-215941.mp3";
+import song10 from "@/../public/music/you-belong-to-me-178037.mp3";
+import song11 from "@/../public/music/Interstellar-Theme.mp3";
+
 
 // Define meditation tracks with local file paths (place audio files in the public/music folder)
 const meditationTracks = [
   {
-    id: "weightless",
-    title: "Weightless",
-    description: "By Marconi Union - Deeply calming ambient music",
-    duration: 480, // 8 minutes in seconds
+    id: "ethereal-electronic",
+    title: "Ethereal Electronic",
+    description: "Ambient electronic soundscape for deep relaxation",
+    duration: 180,
     type: "ambient",
-    time: "8 min",
+    time: "3:00 min",
     icon: <MoonStar className="h-5 w-5" />,
-    audio: "/music/weightless.mp3"
+    audio: song1
   },
   {
-    id: "longing-to-belong",
-    title: "Longing to Belong",
-    description: "By Eddie Vedder - Gentle ukulele and strings",
-    duration: 240, // 4 minutes in seconds
-    type: "ambient",
-    time: "4 min",
-    icon: <Music className="h-5 w-5" />,
-    audio: "/music/longing-to-belong.mp3"
-  },
-  {
-    id: "inner-peace",
-    title: "Meditations for Inner Peace",
-    description: "By Deuter - Peaceful flute and ambient sounds",
-    duration: 600, // 10 minutes in seconds
+    id: "relaxation-meditation",
+    title: "Relaxation Meditation",
+    description: "Soothing sounds to calm the mind and reduce stress",
+    duration: 240,
     type: "guided",
-    time: "10 min",
+    time: "4:00 min",
     icon: <Wind className="h-5 w-5" />,
-    audio: "/music/inner-peace.mp3"
+    audio: song2
+  },
+  {
+    id: "serene-view",
+    title: "Serene View",
+    description: "Peaceful nature-inspired meditation soundtrack",
+    duration: 210,
+    type: "ambient",
+    time: "3:30 min",
+    icon: <Leaf className="h-5 w-5" />,
+    audio: song3
+  },
+  {
+    id: "smooth-meditation",
+    title: "Smooth Meditation",
+    description: "Gentle flowing tones for mindfulness practice",
+    duration: 300,
+    type: "ambient",
+    time: "5:00 min",
+    icon: <Waves className="h-5 w-5" />,
+    audio: song4
+  },
+  {
+    id: "spiritual-moment",
+    title: "Spiritual Moment",
+    description: "Transcendent sounds for spiritual connection",
+    duration: 270,
+    type: "chant",
+    time: "4:30 min",
+    icon: <Sun className="h-5 w-5" />,
+    audio: song5
+  },
+  {
+    id: "valley-sunset",
+    title: "Valley Sunset",
+    description: "Immersive soundscape inspired by natural landscapes",
+    duration: 330,
+    type: "ambient",
+    time: "5:30 min",
+    icon: <Music className="h-5 w-5" />,
+    audio: song6
+  },
+  {
+    id: "yoga-music",
+    title: "Yoga Harmony",
+    description: "Perfect accompaniment for yoga and stretching",
+    duration: 360,
+    type: "rhythm",
+    time: "6:00 min",
+    icon: <Heart className="h-5 w-5" />,
+    audio: song7
   },
   {
     id: "om-namah-shivaya",
     title: "Om Namah Shivaya",
-    description: "Traditional Chant - Sacred mantra for peace",
-    duration: 360, // 6 minutes in seconds
+    description: "Traditional sacred mantra for deep meditation",
+    duration: 420,
     type: "chant",
-    time: "6 min",
+    time: "7:00 min",
     icon: <Sun className="h-5 w-5" />,
-    audio: "/music/om-namah-shivaya.mp3"
+    audio: song8
   },
   {
-    id: "drum-medicine",
-    title: "Drum Medicine",
-    description: "By David & Steve Gordon - Healing drumming",
-    duration: 420, // 7 minutes in seconds
+    id: "soft-drum-bass",
+    title: "Soft Drum & Bass",
+    description: "Gentle rhythmic patterns to focus the mind",
+    duration: 285,
     type: "rhythm",
-    time: "7 min",
+    time: "4:45 min",
     icon: <Waves className="h-5 w-5" />,
-    audio: "/music/drum-medicine.mp3"
+    audio: song9
   },
   {
-    id: "ethereal-buddha",
-    title: "Ethereal Buddha Vibes",
-    description: "By Sandeep Khurana - Deep meditative sounds",
-    duration: 540, // 9 minutes in seconds
+    id: "you-belong-to-me",
+    title: "You Belong To Me",
+    description: "Soothing melody for emotional balance",
+    duration: 240,
     type: "ambient",
-    time: "9 min",
-    icon: <Leaf className="h-5 w-5" />,
-    audio: "/music/ethereal-buddha.mp3"
-  },
-  {
-    id: "stay",
-    title: "S.T.A.Y.",
-    description: "By Hans Zimmer (Interstellar) - Emotional piano",
-    duration: 330, // 5.5 minutes in seconds
-    type: "cinematic",
-    time: "5.5 min",
+    time: "4:00 min",
     icon: <Heart className="h-5 w-5" />,
-    audio: "/music/stay.mp3"
+    audio: song10
   },
   {
-    id: "no-time-for-caution",
-    title: "No Time for Caution",
-    description: "By Hans Zimmer (Interstellar) - Powerful organ",
-    duration: 300, // 5 minutes in seconds
+    id: "interstellar-theme",
+    title: "Interstellar Theme",
+    description: "By Hans Zimmer - Cosmic meditation journey",
+    duration: 390,
     type: "cinematic",
-    time: "5 min",
+    time: "6:30 min",
     icon: <Clock className="h-5 w-5" />,
-    audio: "/music/no-time-for-caution.mp3"
-  },
-  {
-    id: "can-you-hear-the-music",
-    title: "Can You Hear the Music",
-    description: "By Ludwig Göransson (Oppenheimer) - Mysterious",
-    duration: 270, // 4.5 minutes in seconds
-    type: "cinematic",
-    time: "4.5 min",
-    icon: <Music className="h-5 w-5" />,
-    audio: "/music/can-you-hear-the-music.mp3"
-  },
-  {
-    id: "fusion",
-    title: "Fusion",
-    description: "By Ludwig Göransson (Oppenheimer) - Ethereal",
-    duration: 390, // 6.5 minutes in seconds
-    type: "cinematic",
-    time: "6.5 min",
-    icon: <Flame className="h-5 w-5" />,
-    audio: "/music/fusion.mp3"
+    audio: song11
   }
 ];
 
@@ -160,9 +181,49 @@ const MeditationPage = () => {
   const [streak, setStreak] = useState(0);
   const [sessionsByDay, setSessionsByDay] = useState<any[]>([]);
   const [sessionsByType, setSessionsByType] = useState<any[]>([]);
+  const [availableTracks, setAvailableTracks] = useState<string[]>([]);
+  const [audioError, setAudioError] = useState<string | null>(null);
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const timerRef = useRef<number | null>(null);
   const { playSound } = useSound();
+
+  // Check if audio files exist
+  useEffect(() => {
+    const checkAudioFiles = async () => {
+      const availableAudioFiles: string[] = [];
+      
+      for (const track of meditationTracks) {
+        try {
+          const response = await fetch(track.audio, { method: 'HEAD' });
+          if (response.ok) {
+            availableAudioFiles.push(track.id);
+          } else {
+            console.warn(`Audio file not found: ${track.audio}`);
+          }
+        } catch (error) {
+          console.warn(`Error checking audio file: ${track.audio}`, error);
+        }
+      }
+      
+      setAvailableTracks(availableAudioFiles);
+      
+      if (availableAudioFiles.length === 0) {
+        toast({
+          title: "Audio files missing",
+          description: "No meditation audio files found. Please add MP3 files to your public/music folder.",
+          variant: "destructive"
+        });
+      } else if (availableAudioFiles.length !== meditationTracks.length) {
+        toast({
+          title: "Some audio files missing",
+          description: `Found ${availableAudioFiles.length} out of ${meditationTracks.length} audio files.`,
+          variant: "warning"
+        });
+      }
+    };
+    
+    checkAudioFiles();
+  }, []);
 
   useEffect(() => {
     // Load meditation statistics
@@ -234,6 +295,7 @@ const MeditationPage = () => {
       audioRef.current.pause();
     }
     
+    setAudioError(null);
     playSound("click");
     setSelectedTrack(track);
     setCurrentTime(0);
@@ -257,12 +319,37 @@ const MeditationPage = () => {
         timerRef.current = null;
       }
     } else {
-      audioRef.current?.play();
-      timerRef.current = window.setInterval(() => {
-        if (audioRef.current) {
-          setCurrentTime(Math.floor(audioRef.current.currentTime));
-        }
-      }, 1000);
+      // Check if track is available before playing
+      if (!availableTracks.includes(selectedTrack.id)) {
+        setAudioError(`Unable to play "${selectedTrack.title}". Audio file not found.`);
+        toast({
+          title: "Audio file not found",
+          description: `The audio file for "${selectedTrack.title}" is missing.`,
+          variant: "destructive"
+        });
+        return;
+      }
+      
+      const playPromise = audioRef.current?.play();
+      if (playPromise !== undefined) {
+        playPromise.then(() => {
+          // Playback started successfully
+          timerRef.current = window.setInterval(() => {
+            if (audioRef.current) {
+              setCurrentTime(Math.floor(audioRef.current.currentTime));
+            }
+          }, 1000);
+        }).catch(error => {
+          // Playback failed
+          setAudioError(`Unable to play "${selectedTrack.title}". ${error.message}`);
+          toast({
+            title: "Playback error",
+            description: `Failed to play "${selectedTrack.title}": ${error.message}`,
+            variant: "destructive"
+          });
+          return;
+        });
+      }
     }
     
     setIsPlaying(!isPlaying);
@@ -287,6 +374,18 @@ const MeditationPage = () => {
       setTotalSessions(prev => prev + 1);
       setTotalTime(getTotalMeditationTime());
       setStreak(getMeditationStreak());
+    }
+  };
+
+  const handleAudioError = (e: React.SyntheticEvent<HTMLAudioElement>) => {
+    if (selectedTrack) {
+      setIsPlaying(false);
+      setAudioError(`Unable to load "${selectedTrack.title}". Please check if the audio file exists.`);
+      toast({
+        title: "Audio error",
+        description: `Failed to load "${selectedTrack.title}". Please make sure the file exists.`,
+        variant: "destructive"
+      });
     }
   };
 
@@ -327,7 +426,11 @@ const MeditationPage = () => {
                   Player
                 </div>
                 <CardTitle className="text-lg font-medium">Meditation Sessions</CardTitle>
-                <CardDescription>Select a track to begin your meditation journey</CardDescription>
+                <CardDescription>
+                  {availableTracks.length === 0 
+                    ? "No audio files found. Please add MP3 files to your public/music folder." 
+                    : `${availableTracks.length} of ${meditationTracks.length} audio tracks available`}
+                </CardDescription>
               </CardHeader>
               <CardContent className="p-6">
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-2 xl:grid-cols-3 gap-4 mb-8">
@@ -339,7 +442,7 @@ const MeditationPage = () => {
                         selectedTrack?.id === track.id 
                           ? 'bg-primary/20 border border-primary/30' 
                           : 'bg-accent/30 border border-accent/10'
-                      }`}
+                      } ${!availableTracks.includes(track.id) && 'opacity-50'}`}
                     >
                       <div className="flex items-center gap-3">
                         <div className={`p-2 rounded-full ${
@@ -348,7 +451,11 @@ const MeditationPage = () => {
                           {track.icon}
                         </div>
                         <div>
-                          <h3 className="font-medium text-sm">{track.title}</h3>
+                          <h3 className="font-medium text-sm flex items-center gap-1">
+                            {track.title}
+                            {!availableTracks.includes(track.id) && 
+                              <span className="text-xs bg-red-500/10 text-red-500 rounded-full px-2">Missing</span>}
+                          </h3>
                           <div className="flex items-center gap-2 mt-1">
                             <Timer className="h-3 w-3 text-muted-foreground" />
                             <span className="text-xs text-muted-foreground">{track.time}</span>
@@ -368,11 +475,13 @@ const MeditationPage = () => {
                           <Badge className="mb-2">{selectedTrack.type}</Badge>
                           <h2 className="text-xl font-medium">{selectedTrack.title}</h2>
                           <p className="text-sm text-muted-foreground">{selectedTrack.description}</p>
+                          {audioError && <p className="text-sm text-red-500 mt-2">{audioError}</p>}
                         </div>
                         <Button 
                           onClick={handlePlayPause}
                           size="lg"
                           className={`rounded-full h-14 w-14 ${isPlaying ? 'bg-primary/80' : 'bg-primary'}`}
+                          disabled={!availableTracks.includes(selectedTrack.id)}
                         >
                           {isPlaying ? <Pause className="h-6 w-6" /> : <Play className="h-6 w-6" />}
                         </Button>
@@ -395,6 +504,8 @@ const MeditationPage = () => {
                         ref={audioRef}
                         src={selectedTrack.audio}
                         onEnded={handleTrackEnd}
+                        onError={handleAudioError}
+                        preload="metadata"
                         className="hidden"
                       />
                     </div>
