@@ -1,4 +1,6 @@
+
 import React, { useState, useEffect, useRef } from "react";
+import Layout from "@/components/Layout";
 import { 
   Card, 
   CardContent, 
@@ -34,12 +36,14 @@ const BreathingExercise = () => {
   const audioRef = useRef<HTMLAudioElement>(null);
   const { playSound } = useSound();
 
+  // Initialize audio
   useEffect(() => {
     if (audioRef.current) {
       audioRef.current.volume = 0.3;
     }
   }, []);
 
+  // Breathing cycle logic
   useEffect(() => {
     let interval: number | null = null;
     
@@ -47,6 +51,7 @@ const BreathingExercise = () => {
       interval = window.setInterval(() => {
         setTimeLeft((prevTimeLeft) => {
           if (prevTimeLeft <= 1) {
+            // Move to next phase when time is up
             let nextPhase: BreathState;
             let nextTime: number;
             
@@ -104,6 +109,7 @@ const BreathingExercise = () => {
     };
   }, [isActive, currentPhase, soundEnabled, playSound]);
 
+  // Check if we've completed all cycles
   useEffect(() => {
     if (completedCycles >= targetCycles && isActive) {
       setIsActive(false);
@@ -114,6 +120,7 @@ const BreathingExercise = () => {
       
       playSound('success');
       
+      // Save the activity completion to localStorage
       try {
         const selfCareActivities = localStorage.getItem("selfCareActivities");
         if (selfCareActivities) {
@@ -132,6 +139,7 @@ const BreathingExercise = () => {
     }
   }, [completedCycles, targetCycles, isActive, playSound]);
 
+  // Animation for the breathing circle
   useEffect(() => {
     if (!circleRef.current) return;
     
@@ -159,6 +167,7 @@ const BreathingExercise = () => {
   const toggleActive = () => {
     playSound('click');
     if (!isActive && completedCycles >= targetCycles) {
+      // Reset if we're starting again after completing all cycles
       setCompletedCycles(0);
     }
     setIsActive(!isActive);
@@ -198,116 +207,151 @@ const BreathingExercise = () => {
   };
 
   return (
-    <div className="space-y-6">
-      <section className="flex justify-between items-center">
-        <div>
-          <h1 className="text-3xl font-semibold tracking-tight">Breathing Exercise</h1>
-          <p className="text-muted-foreground mt-1">
-            4-7-8 breathing technique for relaxation and stress reduction
-          </p>
-        </div>
-        <Button 
-          variant="outline" 
-          onClick={() => {
-            playSound('click');
-            navigate(-1);
-          }}
-          onMouseEnter={() => playSound('hover')}
-        >
-          <ArrowLeft className="mr-2 h-4 w-4" />
-          Back
-        </Button>
-      </section>
+    <Layout>
+      <div className="space-y-6">
+        <section className="flex justify-between items-center">
+          <div>
+            <h1 className="text-3xl font-semibold tracking-tight">Breathing Exercise</h1>
+            <p className="text-muted-foreground mt-1">
+              4-7-8 breathing technique for relaxation and stress reduction
+            </p>
+          </div>
+          <Button 
+            variant="outline" 
+            onClick={() => {
+              playSound('click');
+              navigate(-1);
+            }}
+            onMouseEnter={() => playSound('hover')}
+          >
+            <ArrowLeft className="mr-2 h-4 w-4" />
+            Back
+          </Button>
+        </section>
 
-      <Card className="glass-card-accent overflow-hidden animate-breathe">
-        <CardHeader className="pb-3">
-          <CardTitle className="text-lg md:text-xl">Guided Breathing</CardTitle>
-          <CardDescription>Follow the animation and instructions</CardDescription>
-        </CardHeader>
-        <CardContent className="flex flex-col items-center justify-center py-6">
-          <div className="relative flex items-center justify-center w-48 h-48 mb-8">
-            <div
-              ref={circleRef}
-              className="absolute w-32 h-32 bg-secondary/30 backdrop-blur-lg rounded-full transition-all"
-            ></div>
-            <div className="absolute pointer-events-none flex flex-col items-center justify-center text-center z-10">
-              <h3 className="text-2xl font-bold mb-1">{getPhaseText()}</h3>
-              <p className="text-sm text-muted-foreground">{timeLeft}s</p>
+        <Card className="glass-card-accent overflow-hidden animate-breathe">
+          <CardHeader className="pb-3">
+            <CardTitle className="text-lg md:text-xl">Guided Breathing</CardTitle>
+            <CardDescription>Follow the animation and instructions</CardDescription>
+          </CardHeader>
+          <CardContent className="flex flex-col items-center justify-center py-6">
+            <div className="relative flex items-center justify-center w-48 h-48 mb-8">
+              <div
+                ref={circleRef}
+                className="absolute w-32 h-32 bg-secondary/30 backdrop-blur-lg rounded-full transition-all"
+              ></div>
+              <div className="absolute pointer-events-none flex flex-col items-center justify-center text-center z-10">
+                <h3 className="text-2xl font-bold mb-1">{getPhaseText()}</h3>
+                <p className="text-sm text-muted-foreground">{timeLeft}s</p>
+              </div>
             </div>
-          </div>
-          
-          <p className="text-center mb-6">{getPhaseDescription()}</p>
-          
-          <div className="flex flex-col items-center gap-2 mb-6">
-            <p className="text-sm font-medium">Cycles Completed</p>
-            <div className="flex gap-1">
-              {Array.from({ length: targetCycles }).map((_, index) => (
-                <div 
-                  key={index}
-                  className={`w-6 h-2 rounded-full ${
-                    index < completedCycles ? 'bg-primary animate-pulse' : 'bg-muted'
-                  }`}
-                ></div>
-              ))}
+            
+            <p className="text-center mb-6">{getPhaseDescription()}</p>
+            
+            <div className="flex flex-col items-center gap-2 mb-6">
+              <p className="text-sm font-medium">Cycles Completed</p>
+              <div className="flex gap-1">
+                {Array.from({ length: targetCycles }).map((_, index) => (
+                  <div 
+                    key={index}
+                    className={`w-6 h-2 rounded-full ${
+                      index < completedCycles ? 'bg-primary animate-pulse' : 'bg-muted'
+                    }`}
+                  ></div>
+                ))}
+              </div>
             </div>
-          </div>
-          
-          <div className="flex items-center gap-4">
-            <Button 
-              onClick={toggleActive} 
-              className="w-32"
-              variant={isActive ? "outline" : "default"}
-              onMouseEnter={() => playSound('hover')}
-            >
-              {isActive ? (
-                <>
-                  <Pause className="mr-2 h-4 w-4" />
-                  Pause
-                </>
-              ) : (
-                <>
-                  <Play className="mr-2 h-4 w-4" />
-                  Start
-                </>
-              )}
-            </Button>
             
-            <Button 
-              variant="ghost" 
-              size="icon" 
-              onClick={resetExercise}
-              onMouseEnter={() => playSound('hover')}
-            >
-              <RefreshCw className="h-4 w-4" />
-            </Button>
-            
-            <Button 
-              variant="ghost" 
-              size="icon" 
-              onClick={toggleSound}
-              onMouseEnter={() => playSound('hover')}
-            >
-              {soundEnabled ? (
-                <Volume2 className="h-4 w-4" />
-              ) : (
-                <VolumeX className="h-4 w-4" />
-              )}
-            </Button>
-          </div>
-        </CardContent>
-      </Card>
+            <div className="flex items-center gap-4">
+              <Button 
+                onClick={toggleActive} 
+                className="w-32"
+                variant={isActive ? "outline" : "default"}
+                onMouseEnter={() => playSound('hover')}
+              >
+                {isActive ? (
+                  <>
+                    <Pause className="mr-2 h-4 w-4" />
+                    Pause
+                  </>
+                ) : (
+                  <>
+                    <Play className="mr-2 h-4 w-4" />
+                    Start
+                  </>
+                )}
+              </Button>
+              
+              <Button 
+                variant="ghost" 
+                size="icon" 
+                onClick={resetExercise}
+                onMouseEnter={() => playSound('hover')}
+              >
+                <RefreshCw className="h-4 w-4" />
+              </Button>
+              
+              <Button 
+                variant="ghost" 
+                size="icon" 
+                onClick={toggleSound}
+                onMouseEnter={() => playSound('hover')}
+              >
+                {soundEnabled ? (
+                  <Volume2 className="h-4 w-4" />
+                ) : (
+                  <VolumeX className="h-4 w-4" />
+                )}
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
 
-      <Separator />
-      
-      <section className="space-y-4">
-        <h2 className="text-xl font-semibold tracking-tight">Benefits of 4-7-8 Breathing</h2>
+        <Separator />
         
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <Card className="glass-card animate-float card-hover">
-            <CardHeader className="pb-2">
-              <CardTitle className="text-base">Reduces Anxiety</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-sm text-muted-foreground">
-                This technique helps activate the parasympathetic nervous system, reducing feelings of anxiety and stress.
-             
+        <section className="space-y-4">
+          <h2 className="text-xl font-semibold tracking-tight">Benefits of 4-7-8 Breathing</h2>
+          
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <Card className="glass-card animate-float card-hover">
+              <CardHeader className="pb-2">
+                <CardTitle className="text-base">Reduces Anxiety</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-sm text-muted-foreground">
+                  This technique helps activate the parasympathetic nervous system, reducing feelings of anxiety and stress.
+                </p>
+              </CardContent>
+            </Card>
+            
+            <Card className="glass-card animate-float card-hover" style={{ animationDelay: "1s" }}>
+              <CardHeader className="pb-2">
+                <CardTitle className="text-base">Improves Sleep</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-sm text-muted-foreground">
+                  Regular practice can help you fall asleep faster and improve overall sleep quality.
+                </p>
+              </CardContent>
+            </Card>
+            
+            <Card className="glass-card animate-float card-hover" style={{ animationDelay: "2s" }}>
+              <CardHeader className="pb-2">
+                <CardTitle className="text-base">Enhances Focus</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-sm text-muted-foreground">
+                  By calming the mind, this breathing exercise can improve concentration and mental clarity.
+                </p>
+              </CardContent>
+            </Card>
+          </div>
+        </section>
+      </div>
+      
+      <audio ref={audioRef} src="https://cdn.pixabay.com/download/audio/2021/08/08/audio_012e4ece50.mp3?filename=bells-audio-30s-7407.mp3" />
+    </Layout>
+  );
+};
+
+export default BreathingExercise;

@@ -1,4 +1,6 @@
+
 import React, { useState, useEffect } from "react";
+import Layout from "@/components/Layout";
 import MoodTracker from "@/components/MoodTracker";
 import JournalEntry from "@/components/JournalEntry";
 import MoodChart from "@/components/MoodChart";
@@ -40,88 +42,90 @@ const Index = () => {
   }, []);
 
   return (
-    <div className="space-y-8">
-      <section>
-        <h1 className="text-3xl font-semibold tracking-tight">
-          {name ? `Welcome back, ${name}` : "Welcome back"}
-        </h1>
-        <p className="text-muted-foreground mt-1">
-          Track your mental wellbeing and develop healthy habits
-        </p>
-      </section>
+    <Layout>
+      <div className="space-y-8">
+        <section>
+          <h1 className="text-3xl font-semibold tracking-tight">
+            {name ? `Welcome back, ${name}` : "Welcome back"}
+          </h1>
+          <p className="text-muted-foreground mt-1">
+            Track your mental wellbeing and develop healthy habits
+          </p>
+        </section>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <div className="lg:col-span-2">
-          <DashboardOverview />
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <div className="lg:col-span-2">
+            <DashboardOverview />
+          </div>
+          
+          <div className="space-y-6">
+            <MoodTracker />
+            <MentalHealthQuiz />
+          </div>
         </div>
         
-        <div className="space-y-6">
-          <MoodTracker />
-          <MentalHealthQuiz />
-        </div>
-      </div>
-      
-      <Separator />
-      
-      <section>
-        <h2 className="text-xl font-semibold tracking-tight mb-4">Daily Activities</h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-          <ReminderCard
-            title="Breathing Exercise"
-            description="Take 5 minutes to center yourself with deep breathing"
-            icon={<Wind className="h-4 w-4" />}
-            time="5 min"
-            actionPath="/breathing"
-          />
-          <ReminderCard
-            title="Mindfulness Check"
-            description="Pause and reflect on your present emotions"
-            icon={<Brain className="h-4 w-4" />}
-            time="2 min"
-            actionPath="/mindfulness"
-          />
-          <ReminderCard
-            title="Daily Reminder"
-            description="Schedule your evening reflection session"
-            icon={<Bell className="h-4 w-4" />}
-            actionText="Set Time"
-            actionPath="/reminders"
-          />
-          <ReminderCard
-            title="Self Care"
-            description="Remember to prioritize your wellbeing today"
-            icon={<HeartPulse className="h-4 w-4" />}
-            actionText="View Tips"
-            actionPath="/self-care"
-          />
-        </div>
-      </section>
-      
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <div className="lg:col-span-2">
-          <JournalEntry />
+        <Separator />
+        
+        <section>
+          <h2 className="text-xl font-semibold tracking-tight mb-4">Daily Activities</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            <ReminderCard
+              title="Breathing Exercise"
+              description="Take 5 minutes to center yourself with deep breathing"
+              icon={<Wind className="h-4 w-4" />}
+              time="5 min"
+              actionPath="/breathing"
+            />
+            <ReminderCard
+              title="Mindfulness Check"
+              description="Pause and reflect on your present emotions"
+              icon={<Brain className="h-4 w-4" />}
+              time="2 min"
+              actionPath="/mindfulness"
+            />
+            <ReminderCard
+              title="Daily Reminder"
+              description="Schedule your evening reflection session"
+              icon={<Bell className="h-4 w-4" />}
+              actionText="Set Time"
+              actionPath="/reminders"
+            />
+            <ReminderCard
+              title="Self Care"
+              description="Remember to prioritize your wellbeing today"
+              icon={<HeartPulse className="h-4 w-4" />}
+              actionText="View Tips"
+              actionPath="/self-care"
+            />
+          </div>
+        </section>
+        
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <div className="lg:col-span-2">
+            <JournalEntry />
+          </div>
+          
+          <div>
+            <HabitTracker />
+          </div>
         </div>
         
-        <div>
-          <HabitTracker />
-        </div>
+        <section className="pt-6 text-center">
+          <p className="text-muted-foreground">
+            Need someone to talk to? Our AI assistant is here to help.
+          </p>
+          <Button 
+            variant="outline" 
+            className="mt-2" 
+            onClick={() => setShowChatbot(true)}
+          >
+            <Sparkles className="mr-2 h-4 w-4" /> Open Mental Health Assistant
+          </Button>
+        </section>
       </div>
       
-      <section className="pt-6 text-center">
-        <p className="text-muted-foreground">
-          Need someone to talk to? Our AI assistant is here to help.
-        </p>
-        <Button 
-          variant="outline" 
-          className="mt-2" 
-          onClick={() => setShowChatbot(true)}
-        >
-          <Sparkles className="mr-2 h-4 w-4" /> Open Mental Health Assistant
-        </Button>
-      </section>
-    </div>
-    
-    <ChatbotInterface initialOpen={showChatbot} />
+      <ChatbotInterface initialOpen={showChatbot} />
+    </Layout>
   );
 };
 
