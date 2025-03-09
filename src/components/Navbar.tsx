@@ -5,7 +5,6 @@ import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
-  DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Link, useLocation } from "react-router-dom";
@@ -15,7 +14,7 @@ import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 const Navbar = () => {
   const location = useLocation();
   const currentPath = location.pathname;
-  const { playSound } = useSound();
+  const { playSound, toggleSound, isSoundEnabled } = useSound();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   const isActivePath = (path: string) => {
@@ -53,26 +52,34 @@ const Navbar = () => {
                 }`}
                 onMouseEnter={() => playSound('hover')}
               >
-                {item.icon}
-                {item.name}
+                <div className="flex flex-col items-center gap-1">
+                  {item.icon}
+                  <span>{item.name}</span>
+                </div>
               </Link>
             ))}
           </div>
           
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="ghost" size="icon" className="rounded-full"
+              <Button 
+                variant="ghost" 
+                size="icon" 
+                className="rounded-full"
                 onMouseEnter={() => playSound('hover')}
-                onClick={() => playSound('click')}
+                onClick={() => {
+                  toggleSound();
+                  playSound('click');
+                }}
               >
                 <User className="h-5 w-5" />
-                <span className="sr-only">User menu</span>
+                <span className="sr-only">Sound toggle</span>
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
-              <DropdownMenuItem onSelect={() => playSound('click')}>Profile</DropdownMenuItem>
-              <DropdownMenuItem onSelect={() => playSound('click')}>Settings</DropdownMenuItem>
-              <DropdownMenuItem onSelect={() => playSound('click')}>Sign out</DropdownMenuItem>
+              <div className="px-2 py-1.5 text-sm">
+                Sound: {isSoundEnabled() ? 'On' : 'Off'}
+              </div>
             </DropdownMenuContent>
           </DropdownMenu>
           
@@ -105,7 +112,7 @@ const Navbar = () => {
                       onClick={handleMenuItemClick}
                     >
                       {item.icon}
-                      {item.name}
+                      <span className="ml-2">{item.name}</span>
                     </Link>
                   ))}
                 </div>
