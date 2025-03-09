@@ -40,7 +40,7 @@ import {
 } from "@/services/localStorage";
 import { PieChart, Pie, Cell, ResponsiveContainer, LineChart, Line, XAxis, YAxis, Tooltip, BarChart, Bar } from "recharts";
 
-// Define meditation tracks with working audio URLs
+// Define meditation tracks with local file paths (place audio files in the public/music folder)
 const meditationTracks = [
   {
     id: "weightless",
@@ -50,7 +50,7 @@ const meditationTracks = [
     type: "ambient",
     time: "8 min",
     icon: <MoonStar className="h-5 w-5" />,
-    audio: "https://dl.sndup.net/mz45/Marconi%20Union%20-%20Weightless.mp3"
+    audio: "/music/weightless.mp3"
   },
   {
     id: "longing-to-belong",
@@ -60,7 +60,7 @@ const meditationTracks = [
     type: "ambient",
     time: "4 min",
     icon: <Music className="h-5 w-5" />,
-    audio: "https://dl.sndup.net/cz4s/Eddie%20Vedder%20-%20Longing%20To%20Belong.mp3"
+    audio: "/music/longing-to-belong.mp3"
   },
   {
     id: "inner-peace",
@@ -70,7 +70,7 @@ const meditationTracks = [
     type: "guided",
     time: "10 min",
     icon: <Wind className="h-5 w-5" />,
-    audio: "https://dl.sndup.net/b9f4/Deuter%20-%20Meditations%20for%20Inner%20Peace.mp3"
+    audio: "/music/inner-peace.mp3"
   },
   {
     id: "om-namah-shivaya",
@@ -80,7 +80,7 @@ const meditationTracks = [
     type: "chant",
     time: "6 min",
     icon: <Sun className="h-5 w-5" />,
-    audio: "https://dl.sndup.net/fgtc/Om%20Namah%20Shivaya%20-%20Traditional%20Chant.mp3"
+    audio: "/music/om-namah-shivaya.mp3"
   },
   {
     id: "drum-medicine",
@@ -90,7 +90,7 @@ const meditationTracks = [
     type: "rhythm",
     time: "7 min",
     icon: <Waves className="h-5 w-5" />,
-    audio: "https://dl.sndup.net/rdcp/David%20%26%20Steve%20Gordon%20-%20Drum%20Medicine.mp3"
+    audio: "/music/drum-medicine.mp3"
   },
   {
     id: "ethereal-buddha",
@@ -100,7 +100,7 @@ const meditationTracks = [
     type: "ambient",
     time: "9 min",
     icon: <Leaf className="h-5 w-5" />,
-    audio: "https://dl.sndup.net/fwjz/Sandeep%20Khurana%20-%20Ethereal%20Buddha%20Vibes.mp3"
+    audio: "/music/ethereal-buddha.mp3"
   },
   {
     id: "stay",
@@ -110,7 +110,7 @@ const meditationTracks = [
     type: "cinematic",
     time: "5.5 min",
     icon: <Heart className="h-5 w-5" />,
-    audio: "https://dl.sndup.net/bzqh/Hans%20Zimmer%20-%20S.T.A.Y.%20(Interstellar).mp3"
+    audio: "/music/stay.mp3"
   },
   {
     id: "no-time-for-caution",
@@ -120,7 +120,7 @@ const meditationTracks = [
     type: "cinematic",
     time: "5 min",
     icon: <Clock className="h-5 w-5" />,
-    audio: "https://dl.sndup.net/c99t/Hans%20Zimmer%20-%20No%20Time%20For%20Caution%20(Interstellar).mp3"
+    audio: "/music/no-time-for-caution.mp3"
   },
   {
     id: "can-you-hear-the-music",
@@ -130,7 +130,7 @@ const meditationTracks = [
     type: "cinematic",
     time: "4.5 min",
     icon: <Music className="h-5 w-5" />,
-    audio: "https://dl.sndup.net/y79h/Ludwig%20G%C3%B6ransson%20-%20Can%20You%20Hear%20the%20Music%20(Oppenheimer).mp3"
+    audio: "/music/can-you-hear-the-music.mp3"
   },
   {
     id: "fusion",
@@ -140,7 +140,7 @@ const meditationTracks = [
     type: "cinematic",
     time: "6.5 min",
     icon: <Flame className="h-5 w-5" />,
-    audio: "https://dl.sndup.net/jswt/Ludwig%20G%C3%B6ransson%20-%20Fusion%20(Oppenheimer).mp3"
+    audio: "/music/fusion.mp3"
   }
 ];
 
