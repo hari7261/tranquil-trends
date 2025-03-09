@@ -3,8 +3,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
-import Layout from "./components/Layout";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Index from "./pages/Index";
 import Journal from "./pages/Journal";
 import JournalNew from "./pages/JournalNew";
@@ -26,19 +25,18 @@ const App = () => (
       <Sonner />
       <BrowserRouter>
         <Routes>
-          <Route element={<Layout />}>
-            <Route path="/" element={<Index />} />
-            <Route path="/journal" element={<Journal />} />
-            <Route path="/journal/new" element={<JournalNew />} />
-            <Route path="/stats" element={<Stats />} />
-            <Route path="/breathing" element={<BreathingExercise />} />
-            <Route path="/mindfulness" element={<MindfulnessCheck />} />
-            <Route path="/reminders" element={<DailyReminder />} />
-            <Route path="/self-care" element={<SelfCare />} />
-            <Route path="/chatbot" element={<Chatbot />} />
-            <Route path="/meditation" element={<MeditationPage />} />
-            <Route path="*" element={<NotFound />} />
-          </Route>
+          <Route path="/" element={<Index />} />
+          <Route path="/journal" element={<Journal />} />
+          <Route path="/journal/new" element={<JournalNew />} />
+          <Route path="/stats" element={<Stats />} />
+          <Route path="/breathing" element={<BreathingExercise />} />
+          <Route path="/mindfulness" element={<MindfulnessCheck />} />
+          <Route path="/reminders" element={<DailyReminder />} />
+          <Route path="/self-care" element={<SelfCare />} />
+          <Route path="/chatbot" element={<Chatbot />} />
+          <Route path="/meditation" element={<MeditationPage />} />
+          {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+          <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
     </TooltipProvider>

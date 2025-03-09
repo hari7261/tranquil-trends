@@ -4,13 +4,13 @@ import { useCallback, useEffect, useRef } from 'react';
 type SoundType = 'click' | 'success' | 'error' | 'notification' | 'hover' | 'transition' | 'complete';
 
 const soundFiles = {
-  click: 'https://assets.mixkit.co/sfx/preview/mixkit-light-button-2580.mp3',
-  success: 'https://assets.mixkit.co/sfx/preview/mixkit-musical-reveal-960.mp3',
-  error: 'https://assets.mixkit.co/sfx/preview/mixkit-alert-quick-chime-766.mp3',
-  notification: 'https://assets.mixkit.co/sfx/preview/mixkit-doorbell-single-press-333.mp3',
-  hover: 'https://assets.mixkit.co/sfx/preview/mixkit-soft-bell-interface-button-2574.mp3',
-  transition: 'https://assets.mixkit.co/sfx/preview/mixkit-cinematic-transition-sweep-495.mp3',
-  complete: 'https://assets.mixkit.co/sfx/preview/mixkit-soft-win-video-game-notification-269.mp3'
+  click: 'https://assets.mixkit.co/active_storage/sfx/212/212-preview.mp3',
+  success: 'https://assets.mixkit.co/active_storage/sfx/270/270-preview.mp3',
+  error: 'https://assets.mixkit.co/active_storage/sfx/249/249-preview.mp3',
+  notification: 'https://assets.mixkit.co/active_storage/sfx/1339/1339-preview.mp3',
+  hover: 'https://assets.mixkit.co/active_storage/sfx/238/238-preview.mp3',
+  transition: 'https://assets.mixkit.co/active_storage/sfx/220/220-preview.mp3',
+  complete: 'https://assets.mixkit.co/active_storage/sfx/1008/1008-preview.mp3'
 };
 
 export const useSound = () => {
@@ -25,7 +25,7 @@ export const useSound = () => {
   });
 
   const soundEnabled = useRef<boolean>(
-    localStorage.getItem('soundEnabled') === 'false' ? false : false // Default to false now
+    localStorage.getItem('soundEnabled') === 'false' ? false : true
   );
 
   useEffect(() => {
@@ -33,7 +33,7 @@ export const useSound = () => {
     Object.entries(soundFiles).forEach(([key, url]) => {
       const audio = new Audio(url);
       audio.preload = 'auto';
-      audio.volume = 0.2; // Lower volume for peaceful experience
+      audio.volume = 0.3;
       audioRefs.current[key as SoundType] = audio;
     });
 

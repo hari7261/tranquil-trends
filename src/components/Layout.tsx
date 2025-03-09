@@ -1,13 +1,19 @@
 
 import React, { useEffect } from "react";
-import { Outlet } from "react-router-dom";
 import Navbar from "./Navbar";
 import { useSound } from "@/hooks/use-sound";
 
-const Layout = () => {
+interface LayoutProps {
+  children: React.ReactNode;
+}
+
+const Layout = ({ children }: LayoutProps) => {
   const { playSound } = useSound();
   
   useEffect(() => {
+    // Play a subtle transition sound when the layout mounts
+    playSound('transition');
+    
     // Add a subtle background pattern
     document.body.classList.add('bg-background');
     
@@ -24,7 +30,7 @@ const Layout = () => {
       
       <main className="flex-1 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 relative z-10">
         <div className="animate-fade-in">
-          <Outlet />
+          {children}
         </div>
       </main>
       
