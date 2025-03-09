@@ -27,7 +27,8 @@ import {
   Clock,
   Flame,
   Calendar,
-  Leaf
+  Leaf,
+  Music
 } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import { useSound } from "@/hooks/use-sound";
@@ -39,57 +40,107 @@ import {
 } from "@/services/localStorage";
 import { PieChart, Pie, Cell, ResponsiveContainer, LineChart, Line, XAxis, YAxis, Tooltip, BarChart, Bar } from "recharts";
 
-// Define meditation tracks
+// Define meditation tracks with the new music
 const meditationTracks = [
   {
-    id: "calm-mind",
-    title: "Calm Mind",
-    description: "Gentle meditation to quiet your thoughts",
-    duration: 300, // 5 minutes in seconds
-    type: "guided",
-    time: "5 min",
+    id: "weightless",
+    title: "Weightless",
+    description: "By Marconi Union - Deeply calming ambient music",
+    duration: 480, // 8 minutes in seconds
+    type: "ambient",
+    time: "8 min",
     icon: <MoonStar className="h-5 w-5" />,
-    audio: "https://storage.googleapis.com/uamp/The_Kyoto_Connection_-_Wake_Up/01_-_Intro_-_The_Way_Of_Waking_Up_feat_Alan_Watts.mp3"
+    audio: "https://cdn.trendybeatz.com/audio/Marconi-Union-Weightless-(TrendyBeatz.com).mp3"
   },
   {
-    id: "morning-energy",
-    title: "Morning Energy",
-    description: "Start your day with positive energy",
-    duration: 180, // 3 minutes in seconds
-    type: "guided",
-    time: "3 min",
-    icon: <Sun className="h-5 w-5" />,
-    audio: "https://storage.googleapis.com/uamp/The_Kyoto_Connection_-_Wake_Up/02_-_Geisha.mp3"
+    id: "longing-to-belong",
+    title: "Longing to Belong",
+    description: "By Eddie Vedder - Gentle ukulele and strings",
+    duration: 240, // 4 minutes in seconds
+    type: "ambient",
+    time: "4 min",
+    icon: <Music className="h-5 w-5" />,
+    audio: "https://dl.sndup.net/cz4s/Eddie%20Vedder%20-%20Longing%20To%20Belong.mp3"
   },
   {
-    id: "deep-breath",
-    title: "Deep Breathing",
-    description: "Focus on your breath to reduce anxiety",
+    id: "inner-peace",
+    title: "Meditations for Inner Peace",
+    description: "By Deuter - Peaceful flute and ambient sounds",
     duration: 600, // 10 minutes in seconds
-    type: "breath",
+    type: "guided",
     time: "10 min",
     icon: <Wind className="h-5 w-5" />,
-    audio: "https://storage.googleapis.com/uamp/The_Kyoto_Connection_-_Wake_Up/03_-_Voyage_I_-_Waterfall.mp3"
+    audio: "https://dl.sndup.net/r75n/Deuter%20-%20Meditations%20for%20Inner%20Peace.mp3"
   },
   {
-    id: "loving-kindness",
-    title: "Loving Kindness",
-    description: "Develop compassion for yourself and others",
+    id: "om-namah-shivaya",
+    title: "Om Namah Shivaya",
+    description: "Traditional Chant - Sacred mantra for peace",
+    duration: 360, // 6 minutes in seconds
+    type: "chant",
+    time: "6 min",
+    icon: <Sun className="h-5 w-5" />,
+    audio: "https://dl.sndup.net/fgtc/Om%20Namah%20Shivaya%20-%20Traditional%20Chant.mp3"
+  },
+  {
+    id: "drum-medicine",
+    title: "Drum Medicine",
+    description: "By David & Steve Gordon - Healing drumming",
     duration: 420, // 7 minutes in seconds
-    type: "guided",
+    type: "rhythm",
     time: "7 min",
-    icon: <Heart className="h-5 w-5" />,
-    audio: "https://storage.googleapis.com/uamp/The_Kyoto_Connection_-_Wake_Up/04_-_Voyage_II_-_Shining_Wind.mp3"
+    icon: <Waves className="h-5 w-5" />,
+    audio: "https://dl.sndup.net/rdcp/David%20%26%20Steve%20Gordon%20-%20Drum%20Medicine.mp3"
   },
   {
-    id: "nature-sounds",
-    title: "Nature Sounds",
-    description: "Immerse yourself in calming nature sounds",
-    duration: 900, // 15 minutes in seconds
+    id: "ethereal-buddha",
+    title: "Ethereal Buddha Vibes",
+    description: "By Sandeep Khurana - Deep meditative sounds",
+    duration: 540, // 9 minutes in seconds
     type: "ambient",
-    time: "15 min",
+    time: "9 min",
     icon: <Leaf className="h-5 w-5" />,
-    audio: "https://storage.googleapis.com/uamp/The_Kyoto_Connection_-_Wake_Up/05_-_Voyage_III_-_Spirit_Of_The_Wind.mp3"
+    audio: "https://dl.sndup.net/wq4k/Sandeep%20Khurana%20-%20Ethereal%20Buddha%20Vibes.mp3"
+  },
+  {
+    id: "stay",
+    title: "S.T.A.Y.",
+    description: "By Hans Zimmer (Interstellar) - Emotional piano",
+    duration: 330, // 5.5 minutes in seconds
+    type: "cinematic",
+    time: "5.5 min",
+    icon: <Heart className="h-5 w-5" />,
+    audio: "https://dl.sndup.net/bzqh/Hans%20Zimmer%20-%20S.T.A.Y.%20(Interstellar).mp3"
+  },
+  {
+    id: "no-time-for-caution",
+    title: "No Time for Caution",
+    description: "By Hans Zimmer (Interstellar) - Powerful organ",
+    duration: 300, // 5 minutes in seconds
+    type: "cinematic",
+    time: "5 min",
+    icon: <Clock className="h-5 w-5" />,
+    audio: "https://dl.sndup.net/c99t/Hans%20Zimmer%20-%20No%20Time%20For%20Caution%20(Interstellar).mp3"
+  },
+  {
+    id: "can-you-hear-the-music",
+    title: "Can You Hear the Music",
+    description: "By Ludwig Göransson (Oppenheimer) - Mysterious",
+    duration: 270, // 4.5 minutes in seconds
+    type: "cinematic",
+    time: "4.5 min",
+    icon: <Music className="h-5 w-5" />,
+    audio: "https://dl.sndup.net/y79h/Ludwig%20G%C3%B6ransson%20-%20Can%20You%20Hear%20the%20Music%20(Oppenheimer).mp3"
+  },
+  {
+    id: "fusion",
+    title: "Fusion",
+    description: "By Ludwig Göransson (Oppenheimer) - Ethereal",
+    duration: 390, // 6.5 minutes in seconds
+    type: "cinematic",
+    time: "6.5 min",
+    icon: <Flame className="h-5 w-5" />,
+    audio: "https://dl.sndup.net/jswt/Ludwig%20G%C3%B6ransson%20-%20Fusion%20(Oppenheimer).mp3"
   }
 ];
 
