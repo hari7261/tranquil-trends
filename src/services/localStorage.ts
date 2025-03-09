@@ -89,7 +89,8 @@ export const getMeditationStreak = (): number => {
   });
   
   // Convert to array and sort
-  const days = Array.from(uniqueDays).sort().reverse();
+  const days = Array.from(uniqueDays) as string[];
+  days.sort().reverse();
   
   // Calculate streak
   let streak = 0;

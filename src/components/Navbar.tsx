@@ -1,5 +1,6 @@
+
 import React, { useState } from "react";
-import { Menu, User, MessageSquareText, X, Waves } from "lucide-react";
+import { Menu, User, MessageSquareText, X, Waves, Home, SquarePen, BarChart3 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -28,8 +29,8 @@ const Navbar = () => {
 
   const navigationItems = [
     { name: "Dashboard", path: "/", icon: <Home className="w-5 h-5" /> },
-    { name: "Journal", path: "/journal", icon: <PenSquare className="w-5 h-5" /> },
-    { name: "Stats", path: "/stats", icon: <BarChart2 className="w-5 h-5" /> },
+    { name: "Journal", path: "/journal", icon: <SquarePen className="w-5 h-5" /> },
+    { name: "Stats", path: "/stats", icon: <BarChart3 className="w-5 h-5" /> },
     { name: "Chatbot", path: "/chatbot", icon: <MessageSquareText className="w-5 h-5" /> },
     { name: "Meditation", path: "/meditation", icon: <Waves className="w-5 h-5" /> },
   ];
