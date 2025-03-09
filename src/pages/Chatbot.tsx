@@ -1,140 +1,133 @@
-
 import React from "react";
 import Layout from "@/components/Layout";
 import ChatbotInterface from "@/components/ChatbotInterface";
-import GeminiChatbot from "@/components/GeminiChatbot";
-import { MessageSquareText, Bot, Info } from "lucide-react";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Card, CardContent } from "@/components/ui/card";
+import { MessageSquareText, Info, BookOpen, Brain, Heart, Shield } from "lucide-react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 
 const Chatbot = () => {
   return (
     <Layout>
-      <div className="space-y-6">
-        <section>
-          <h1 className="text-3xl font-semibold tracking-tight flex items-center gap-2">
-            <MessageSquareText className="h-8 w-8 text-primary" />
-            Mental Health Assistant
+      <div className="container max-w-7xl mx-auto px-4 py-8">
+        <div className="mb-8 text-center">
+          <h1 className="text-4xl font-bold bg-gradient-to-r from-secondary to-purple-500 bg-clip-text text-transparent mb-2">
+            AI Mental Health Assistant
           </h1>
-          <p className="text-muted-foreground mt-1">
-            Talk to our AI assistants about your mental health concerns
+          <p className="text-muted-foreground max-w-2xl mx-auto">
+            A supportive, judgment-free AI companion designed to provide emotional support, coping strategies, 
+            and resources for your mental wellbeing journey.
           </p>
-        </section>
-        
-        <Tabs defaultValue="standard" className="w-full">
-          <TabsList className="grid grid-cols-2 mb-4">
-            <TabsTrigger value="standard">Standard Assistant</TabsTrigger>
-            <TabsTrigger value="gemini">Gemini AI</TabsTrigger>
-          </TabsList>
-          
-          <TabsContent value="standard" className="space-y-6">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              <div className="md:col-span-2">
-                <div className="glass-card p-6 h-full">
-                  <h2 className="text-xl font-medium mb-4">How can the assistant help?</h2>
-                  <ul className="space-y-2 text-muted-foreground">
-                    <li className="flex items-start gap-2">
-                      <span className="text-primary">•</span>
-                      <span>Discuss your feelings and emotions in a safe, private space</span>
-                    </li>
-                    <li className="flex items-start gap-2">
-                      <span className="text-primary">•</span>
-                      <span>Get suggestions for coping strategies and self-care activities</span>
-                    </li>
-                    <li className="flex items-start gap-2">
-                      <span className="text-primary">•</span>
-                      <span>Learn about different mental health topics and resources</span>
-                    </li>
-                    <li className="flex items-start gap-2">
-                      <span className="text-primary">•</span>
-                      <span>Receive supportive guidance for challenging situations</span>
-                    </li>
-                    <li className="flex items-start gap-2">
-                      <span className="text-primary">•</span>
-                      <span>Practice mindfulness and relaxation techniques</span>
-                    </li>
-                  </ul>
-                  
-                  <div className="mt-6 p-4 bg-secondary/20 rounded-lg border border-secondary/30">
-                    <p className="text-sm font-medium">Important Note</p>
-                    <p className="text-xs text-muted-foreground mt-1">
-                      This AI assistant is not a substitute for professional mental health care. 
-                      If you're experiencing a crisis or need immediate help, please contact a mental health 
-                      professional or emergency services.
-                    </p>
-                  </div>
-                </div>
-              </div>
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
+          <div className="lg:col-span-3 order-2 lg:order-1">
+            <Card className="overflow-hidden border-2 border-secondary/10 bg-card/50 backdrop-blur-sm h-[700px]">
+              <CardHeader className="bg-secondary/5 border-b border-secondary/10 pb-4">
+                <CardTitle className="flex items-center gap-2">
+                  <Brain className="h-5 w-5 text-secondary" />
+                  Mental Health Assistant
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="p-0 h-[calc(100%-4rem)]">
+                <ChatbotInterface fullHeight={true} initialOpen={true} />
+              </CardContent>
+            </Card>
+          </div>
               
-              <div className="md:col-span-1">
-                <div className="h-full flex flex-col">
-                  <ChatbotInterface initialOpen={true} fullHeight />
-                </div>
-              </div>
-            </div>
-          </TabsContent>
-          
-          <TabsContent value="gemini" className="space-y-4">
-            <Card className="glass-card-accent border-0">
-              <CardContent className="p-0">
-                <div className="flex flex-col lg:flex-row h-[600px]">
-                  <div className="w-full lg:w-1/3 p-6 border-r border-border/10">
-                    <div className="flex items-center gap-2 mb-4">
-                      <Bot className="h-5 w-5 text-primary" />
-                      <h3 className="text-lg font-medium">Gemini AI Chat</h3>
-                    </div>
+          <div className="lg:col-span-1 space-y-4 order-1 lg:order-2">
+            <Card className="border-2 border-secondary/10 bg-card/50 backdrop-blur-sm">
+              <CardHeader className="bg-secondary/5 border-b border-secondary/10 pb-4">
+                <CardTitle className="text-sm flex items-center gap-2">
+                  <Info className="h-4 w-4 text-secondary" />
+                  About This Assistant
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="pt-4 text-sm">
+                <p>Our Mental Health Assistant provides:</p>
+                <ul className="mt-2 space-y-1 list-disc pl-5">
+                  <li>Emotional support & active listening</li>
+                  <li>Coping strategies for anxiety & stress</li>
+                  <li>Mindfulness & relaxation techniques</li>
+                  <li>Resources for professional help</li>
+                </ul>
                     
-                    <p className="text-sm text-muted-foreground mb-4">
-                      Our advanced Gemini-powered mental health assistant provides more personalized responses and can help with complex concerns.
-                    </p>
+                <Separator className="my-4" />
                     
-                    <Separator className="my-4" />
-                    
-                    <div className="space-y-4">
-                      <div className="bg-background/20 p-4 rounded-lg">
-                        <h4 className="text-sm font-medium flex items-center gap-2">
-                          <Info className="h-4 w-4 text-primary" />
-                          About this assistant
-                        </h4>
-                        <ul className="mt-2 space-y-1 text-xs text-muted-foreground">
-                          <li className="flex items-start gap-1">
-                            <span className="text-primary text-xs">•</span>
-                            <span>Powered by Google's Gemini AI model</span>
-                          </li>
-                          <li className="flex items-start gap-1">
-                            <span className="text-primary text-xs">•</span>
-                            <span>Advanced understanding of mental health topics</span>
-                          </li>
-                          <li className="flex items-start gap-1">
-                            <span className="text-primary text-xs">•</span>
-                            <span>More personalized conversation flow</span>
-                          </li>
-                          <li className="flex items-start gap-1">
-                            <span className="text-primary text-xs">•</span>
-                            <span>Can understand complex emotional concerns</span>
-                          </li>
-                        </ul>
-                      </div>
-                      
-                      <div className="bg-background/20 p-4 rounded-lg">
-                        <h4 className="text-sm font-medium">Conversation privacy</h4>
-                        <p className="mt-1 text-xs text-muted-foreground">
-                          Your conversations are processed by Google's Gemini API.
-                          Please review Google's privacy policy for information on how your data is handled.
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-                  
-                  <div className="flex-1 h-full">
-                    <GeminiChatbot fullHeight />
-                  </div>
+                <div className="text-xs bg-secondary/5 p-3 rounded-lg">
+                  <p className="font-medium text-secondary">Important Note</p>
+                  <p className="mt-1">This AI assistant is not a replacement for professional mental health care. If you're experiencing a crisis, please contact emergency services or a mental health helpline immediately.</p>
                 </div>
               </CardContent>
             </Card>
-          </TabsContent>
-        </Tabs>
+                
+            <Card className="border-2 border-secondary/10 bg-card/50 backdrop-blur-sm">
+              <CardHeader className="bg-secondary/5 border-b border-secondary/10 pb-4">
+                <CardTitle className="text-sm flex items-center gap-2">
+                  <Heart className="h-4 w-4 text-secondary" />
+                  Sample Questions
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="pt-4 text-sm">
+                <div className="space-y-2">
+                  {[
+                    "I'm feeling overwhelmed with work lately",
+                    "What are some good breathing techniques for anxiety?",
+                    "How can I improve my sleep quality?",
+                    "I'm having trouble staying motivated",
+                    "What are some self-care activities I can try?"
+                  ].map((question, i) => (
+                    <div key={i} className="p-2 bg-secondary/5 rounded-md hover:bg-secondary/10 cursor-pointer transition-colors text-xs">
+                      {question}
+                    </div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card className="border-2 border-secondary/10 bg-card/50 backdrop-blur-sm">
+              <CardHeader className="bg-secondary/5 border-b border-secondary/10 pb-4">
+                <CardTitle className="text-sm flex items-center gap-2">
+                  <Shield className="h-4 w-4 text-secondary" />
+                  Privacy & Ethics
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="pt-4 text-sm">
+                <p>Your conversations with our assistant are:</p>
+                <ul className="mt-2 space-y-1 list-disc pl-5">
+                  <li>Private and not stored permanently</li>
+                  <li>Not used to train AI without consent</li>
+                  <li>Protected by industry-standard encryption</li>
+                </ul>
+                <p className="mt-3 text-xs text-muted-foreground">We prioritize your confidentiality while providing supportive guidance.</p>
+              </CardContent>
+            </Card>
+                
+            <Card className="border-2 border-secondary/10 bg-card/50 backdrop-blur-sm">
+              <CardHeader className="bg-secondary/5 border-b border-secondary/10 pb-4">
+                <CardTitle className="text-sm flex items-center gap-2">
+                  <BookOpen className="h-4 w-4 text-secondary" />
+                  Resources
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="pt-4 text-sm">
+                <div className="space-y-3">
+                  <a href="#" className="block bg-secondary/5 p-3 rounded-lg hover:bg-secondary/10 transition-colors">
+                    <p className="font-medium">Mental Health Foundation</p>
+                    <p className="text-xs mt-1 text-muted-foreground">Evidence-based resources and guidance</p>
+                  </a>
+                  <a href="#" className="block bg-secondary/5 p-3 rounded-lg hover:bg-secondary/10 transition-colors">
+                    <p className="font-medium">Mindfulness Practices</p>
+                    <p className="text-xs mt-1 text-muted-foreground">Simple techniques for daily well-being</p>
+                  </a>
+                  <a href="#" className="block bg-secondary/5 p-3 rounded-lg hover:bg-secondary/10 transition-colors">
+                    <p className="font-medium">Crisis Support Hotlines</p>
+                    <p className="text-xs mt-1 text-muted-foreground">24/7 assistance for emergencies</p>
+                  </a>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        </div>
       </div>
     </Layout>
   );

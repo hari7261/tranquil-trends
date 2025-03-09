@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -10,9 +9,23 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Avatar } from "@/components/ui/avatar";
-import { Bot, Send, User, X, Maximize2, Minimize2, Volume2, VolumeX } from "lucide-react";
+import { 
+  Bot, 
+  Send, 
+  User, 
+  X, 
+  Maximize2, 
+  Minimize2, 
+  Volume2, 
+  VolumeX, 
+  RefreshCcw,
+  Sparkles
+} from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import { useSound } from "@/hooks/use-sound";
+import { motion, AnimatePresence } from "framer-motion";
+import ReactMarkdown from "react-markdown";
+import { Badge } from "@/components/ui/badge";
 
 // Mock responses for the chatbot
 const SAMPLE_RESPONSES = [
@@ -32,6 +45,7 @@ interface Message {
   text: string;
   sender: "user" | "bot";
   timestamp: Date;
+  id?: string;
 }
 
 interface ChatbotInterfaceProps {
@@ -46,9 +60,10 @@ const ChatbotInterface: React.FC<ChatbotInterfaceProps> = ({
   const [isOpen, setIsOpen] = useState(initialOpen);
   const [messages, setMessages] = useState<Message[]>([
     {
-      text: "Hi there! I'm your mental health assistant. How can I support you today?",
+      text: "Hi there! I'm your mental health assistant. How are you feeling today?",
       sender: "bot",
       timestamp: new Date(),
+      id: "welcome-message"
     },
   ]);
   const [inputMessage, setInputMessage] = useState("");
@@ -56,24 +71,48 @@ const ChatbotInterface: React.FC<ChatbotInterfaceProps> = ({
   const [isExpanded, setIsExpanded] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const { playSound, toggleSound, isSoundEnabled } = useSound();
+  const [isTyping, setIsTyping] = useState(false);
+  const [currentlyTyping, setCurrentlyTyping] = useState("");
+  const typingSpeed = 30; // milliseconds per character
 
   // Scroll to bottom whenever messages change
   useEffect(() => {
     if (messagesEndRef.current) {
       messagesEndRef.current.scrollIntoView({ behavior: "smooth" });
     }
-  }, [messages]);
+  }, [messages, currentlyTyping]);
+
+  // Simulate typing effect for bot messages
+  const simulateTyping = (text: string, onComplete: (text: string) => void) => {
+    setIsTyping(true);
+    setCurrentlyTyping("");
+    
+    let i = 0;
+    const interval = setInterval(() => {
+      setCurrentlyTyping(prev => prev + text[i]);
+      i++;
+      
+      if (i === text.length) {
+        clearInterval(interval);
+        setIsTyping(false);
+        onComplete(text);
+      }
+    }, typingSpeed);
+    
+    return () => clearInterval(interval);
+  };
 
   const handleSendMessage = () => {
     if (!inputMessage.trim()) return;
 
     playSound('click');
 
-    // Add user message
+    // Add user message with unique ID
     const userMessage: Message = {
       text: inputMessage,
       sender: "user",
       timestamp: new Date(),
+      id: `user-${Date.now()}`
     };
 
     setMessages((prev) => [...prev, userMessage]);
@@ -85,15 +124,19 @@ const ChatbotInterface: React.FC<ChatbotInterfaceProps> = ({
       // In a real app, we would call the Gemini API here
       const randomResponse = SAMPLE_RESPONSES[Math.floor(Math.random() * SAMPLE_RESPONSES.length)];
       
-      const botMessage: Message = {
-        text: randomResponse,
-        sender: "bot",
-        timestamp: new Date(),
-      };
-      
-      setMessages((prev) => [...prev, botMessage]);
-      setIsProcessing(false);
-      playSound('notification');
+      // Start typing animation
+      simulateTyping(randomResponse, (text) => {
+        const botMessage: Message = {
+          text,
+          sender: "bot",
+          timestamp: new Date(),
+          id: `bot-${Date.now()}`
+        };
+        
+        setMessages((prev) => [...prev, botMessage]);
+        setIsProcessing(false);
+        playSound('notification');
+      });
     }, 1500);
   };
 
@@ -124,23 +167,36 @@ const ChatbotInterface: React.FC<ChatbotInterfaceProps> = ({
       description: newSoundState ? "You will now hear interactive sounds" : "Sounds are now muted",
     });
   };
+  
+  const resetChat = () => {
+    playSound('transition');
+    setMessages([{
+      text: "Hi there! I'm your mental health assistant. How are you feeling today?",
+      sender: "bot",
+      timestamp: new Date(),
+      id: "welcome-message-new"
+    }]);
+  };
 
   if (fullHeight && isOpen) {
     return (
-      <Card className="w-full h-full max-h-[75vh] md:max-h-none flex flex-col overflow-hidden glass-card-accent">
-        <CardHeader className="bg-secondary/20 py-3">
+      <div className="w-full h-full flex flex-col overflow-hidden bg-background/80 backdrop-blur-sm">
+        <div className="bg-secondary/10 py-3 px-4 border-b border-secondary/20">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <Avatar className="h-8 w-8 bg-secondary/30">
-                <Bot className="h-4 w-4 text-secondary-foreground" />
+              <Avatar className="h-8 w-8 bg-secondary/20">
+                <Bot className="h-4 w-4 text-secondary" />
               </Avatar>
-              <CardTitle className="text-base">Mental Health Assistant</CardTitle>
+              <div>
+                <h3 className="text-base font-medium">Mental Health Assistant</h3>
+                <p className="text-xs text-muted-foreground">Supportive conversation & coping strategies</p>
+              </div>
             </div>
-            <div className="flex items-center gap-1">
+            <div className="flex items-center gap-2">
               <Button
                 variant="ghost"
                 size="icon"
-                className="h-7 w-7"
+                className="h-8 w-8 hover:bg-secondary/10"
                 onClick={handleToggleSound}
                 onMouseEnter={() => playSound('hover')}
               >
@@ -150,84 +206,131 @@ const ChatbotInterface: React.FC<ChatbotInterfaceProps> = ({
                   <VolumeX className="h-4 w-4" />
                 )}
               </Button>
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-8 w-8 hover:bg-secondary/10"
+                onClick={resetChat}
+                onMouseEnter={() => playSound('hover')}
+              >
+                <RefreshCcw className="h-4 w-4" />
+              </Button>
             </div>
           </div>
-        </CardHeader>
-        <CardContent className="flex-1 overflow-y-auto p-3 space-y-4">
-          {messages.map((message, index) => (
-            <div
-              key={index}
-              className={`flex ${
-                message.sender === "user" ? "justify-end" : "justify-start"
-              }`}
-            >
-              <div
-                className={`max-w-[80%] p-3 rounded-lg ${
-                  message.sender === "user"
-                    ? "bg-primary text-primary-foreground animate-slide-in"
-                    : "bg-secondary/20 animate-fade-in"
+        </div>
+
+        <div className="flex-1 overflow-y-auto p-4 space-y-5">
+          <AnimatePresence>
+            {messages.map((message) => (
+              <motion.div
+                key={message.id}
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -10 }}
+                transition={{ duration: 0.3 }}
+                className={`flex ${
+                  message.sender === "user" ? "justify-end" : "justify-start"
                 }`}
               >
-                <div className="flex items-center mb-1 gap-1">
-                  {message.sender === "bot" ? (
-                    <Bot className="h-3 w-3" />
-                  ) : (
-                    <User className="h-3 w-3" />
-                  )}
-                  <span className="text-xs opacity-75">
-                    {message.sender === "user" ? "You" : "Assistant"}
-                  </span>
+                <div
+                  className={`max-w-[85%] flex ${
+                    message.sender === "user" ? "flex-row-reverse" : "flex-row"
+                  } items-start gap-3`}
+                >
+                  <div 
+                    className={`shrink-0 flex items-center justify-center h-8 w-8 rounded-full ${
+                      message.sender === "user" 
+                        ? "bg-primary/20 text-primary-foreground" 
+                        : "bg-secondary/20 text-secondary"
+                    }`}
+                  >
+                    {message.sender === "user" ? (
+                      <User className="h-4 w-4" />
+                    ) : (
+                      <Bot className="h-4 w-4" />
+                    )}
+                  </div>
+                  <div>
+                    <div
+                      className={`p-3 rounded-2xl ${
+                        message.sender === "user"
+                          ? "bg-primary text-primary-foreground"
+                          : "bg-secondary/10 border border-secondary/10"
+                      }`}
+                    >
+                      <div className="prose prose-sm dark:prose-invert max-w-none">
+                        <ReactMarkdown>{message.text}</ReactMarkdown>
+                      </div>
+                    </div>
+                    <div className="text-xs text-muted-foreground mt-1 px-1 flex items-center gap-1">
+                      {message.sender === "bot" && (
+                        <Badge variant="outline" className="text-[10px] py-0 h-4 px-1 mr-1 border-secondary/20">
+                          <Sparkles className="h-2.5 w-2.5 mr-1 text-secondary/70" />
+                          AI Assistant
+                        </Badge>
+                      )}
+                      <span>
+                        {new Date(message.timestamp).toLocaleTimeString([], {
+                          hour: "2-digit",
+                          minute: "2-digit",
+                        })}
+                      </span>
+                    </div>
+                  </div>
                 </div>
-                <p className="text-sm whitespace-pre-wrap">{message.text}</p>
-                <p className="text-xs opacity-50 mt-1 text-right">
-                  {new Date(message.timestamp).toLocaleTimeString([], {
-                    hour: "2-digit",
-                    minute: "2-digit",
-                  })}
-                </p>
-              </div>
-            </div>
-          ))}
-          <div ref={messagesEndRef} />
-          {isProcessing && (
-            <div className="flex justify-start">
-              <div className="bg-secondary/20 p-3 rounded-lg max-w-[80%]">
-                <div className="flex items-center gap-1">
-                  <Bot className="h-3 w-3" />
-                  <div className="ml-2 flex space-x-1">
-                    <div className="h-2 w-2 rounded-full bg-secondary animate-bounce" style={{ animationDelay: '0ms' }}></div>
-                    <div className="h-2 w-2 rounded-full bg-secondary animate-bounce" style={{ animationDelay: '300ms' }}></div>
-                    <div className="h-2 w-2 rounded-full bg-secondary animate-bounce" style={{ animationDelay: '600ms' }}></div>
+              </motion.div>
+            ))}
+          </AnimatePresence>
+
+          {/* Typing indicator */}
+          {isTyping && (
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="flex justify-start"
+            >
+              <div className="max-w-[85%] flex flex-row items-start gap-3">
+                <div className="shrink-0 flex items-center justify-center h-8 w-8 rounded-full bg-secondary/20 text-secondary">
+                  <Bot className="h-4 w-4" />
+                </div>
+                <div>
+                  <div className="p-3 rounded-2xl bg-secondary/10 border border-secondary/10">
+                    <p className="text-sm">{currentlyTyping}<span className="animate-pulse">|</span></p>
                   </div>
                 </div>
               </div>
-            </div>
+            </motion.div>
           )}
-        </CardContent>
-        <CardFooter className="p-3 pt-2 border-t border-accent/20">
-          <div className="flex w-full items-center gap-2">
+          
+          <div ref={messagesEndRef} />
+        </div>
+
+        <div className="p-4 border-t border-secondary/10 bg-background/50">
+          <div className="flex items-center gap-2">
             <Input
-              placeholder="Type your message..."
+              placeholder="Type your message here..."
               value={inputMessage}
               onChange={(e) => setInputMessage(e.target.value)}
               onKeyDown={handleKeyPress}
-              className="flex-1 bg-background/50"
+              className="flex-1 bg-background/50 border-secondary/20 focus-visible:ring-secondary/30"
               disabled={isProcessing}
             />
             <Button 
               onClick={handleSendMessage} 
               disabled={!inputMessage.trim() || isProcessing}
+              className="bg-secondary hover:bg-secondary/90 text-secondary-foreground"
               onMouseEnter={() => playSound('hover')}
-              className="bg-primary hover:bg-primary/90"
             >
-              <Send className="h-4 w-4" />
+              <Send className="h-4 w-4 mr-2" />
+              {isProcessing ? "Processing..." : "Send"}
             </Button>
           </div>
-        </CardFooter>
-      </Card>
+        </div>
+      </div>
     );
   }
 
+  // This is the floating version, which we'll keep in case it's ever used elsewhere
   return (
     <>
       {/* Floating button to open chat when closed */}
@@ -296,40 +399,45 @@ const ChatbotInterface: React.FC<ChatbotInterfaceProps> = ({
             </div>
           </CardHeader>
           <CardContent className="flex-1 overflow-y-auto p-3 space-y-4">
-            {messages.map((message, index) => (
-              <div
-                key={index}
-                className={`flex ${
-                  message.sender === "user" ? "justify-end" : "justify-start"
-                }`}
-              >
-                <div
-                  className={`max-w-[80%] p-3 rounded-lg ${
-                    message.sender === "user"
-                      ? "bg-primary text-primary-foreground animate-slide-in"
-                      : "bg-secondary/20 animate-fade-in"
+            <AnimatePresence>
+              {messages.map((message, index) => (
+                <motion.div
+                  key={index}
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -10 }}
+                  className={`flex ${
+                    message.sender === "user" ? "justify-end" : "justify-start"
                   }`}
                 >
-                  <div className="flex items-center mb-1 gap-1">
-                    {message.sender === "bot" ? (
-                      <Bot className="h-3 w-3" />
-                    ) : (
-                      <User className="h-3 w-3" />
-                    )}
-                    <span className="text-xs opacity-75">
-                      {message.sender === "user" ? "You" : "Assistant"}
-                    </span>
+                  <div
+                    className={`max-w-[80%] p-3 rounded-lg ${
+                      message.sender === "user"
+                        ? "bg-primary text-primary-foreground animate-slide-in"
+                        : "bg-secondary/20 animate-fade-in"
+                    }`}
+                  >
+                    <div className="flex items-center mb-1 gap-1">
+                      {message.sender === "bot" ? (
+                        <Bot className="h-3 w-3" />
+                      ) : (
+                        <User className="h-3 w-3" />
+                      )}
+                      <span className="text-xs opacity-75">
+                        {message.sender === "user" ? "You" : "Assistant"}
+                      </span>
+                    </div>
+                    <p className="text-sm whitespace-pre-wrap">{message.text}</p>
+                    <p className="text-xs opacity-50 mt-1 text-right">
+                      {new Date(message.timestamp).toLocaleTimeString([], {
+                        hour: "2-digit",
+                        minute: "2-digit",
+                      })}
+                    </p>
                   </div>
-                  <p className="text-sm whitespace-pre-wrap">{message.text}</p>
-                  <p className="text-xs opacity-50 mt-1 text-right">
-                    {new Date(message.timestamp).toLocaleTimeString([], {
-                      hour: "2-digit",
-                      minute: "2-digit",
-                    })}
-                  </p>
-                </div>
-              </div>
-            ))}
+                </motion.div>
+              ))}
+            </AnimatePresence>
             <div ref={messagesEndRef} />
             {isProcessing && (
               <div className="flex justify-start">
@@ -346,7 +454,7 @@ const ChatbotInterface: React.FC<ChatbotInterfaceProps> = ({
               </div>
             )}
           </CardContent>
-          <CardFooter className="p-3 pt-2 border-t border-accent/20">
+          <CardFooter className="p-3 pt-2 border-t border-secondary/20">
             <div className="flex w-full items-center gap-2">
               <Input
                 placeholder="Type your message..."
@@ -360,7 +468,7 @@ const ChatbotInterface: React.FC<ChatbotInterfaceProps> = ({
                 onClick={handleSendMessage} 
                 disabled={!inputMessage.trim() || isProcessing}
                 onMouseEnter={() => playSound('hover')}
-                className="bg-primary hover:bg-primary/90"
+                className="bg-secondary hover:bg-secondary/90"
               >
                 <Send className="h-4 w-4" />
               </Button>
