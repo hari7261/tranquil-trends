@@ -1,6 +1,5 @@
-
-import React, { useState } from "react";
-import { Menu, User, MessageSquareText, X, Waves, Home, SquarePen, BarChart3 } from "lucide-react";
+import React, { useState, useEffect } from "react";
+import { Menu, User, MessageSquareText, X, Waves, Home, SquarePen, BarChart3, LogOut } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -8,15 +7,27 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useSound } from "@/hooks/use-sound";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import { toast } from "@/hooks/use-toast";
+import { Separator } from "@/components/ui/separator";
 
 const Navbar = () => {
   const location = useLocation();
+  const navigate = useNavigate();
   const currentPath = location.pathname;
   const { playSound } = useSound();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [userName, setUserName] = useState("");
+
+  useEffect(() => {
+    // Load user name from localStorage
+    const name = localStorage.getItem("userName");
+    if (name) {
+      setUserName(name);
+    }
+  }, []);
 
   const isActivePath = (path: string) => {
     return currentPath === path;
@@ -27,12 +38,33 @@ const Navbar = () => {
     setIsMenuOpen(false);
   };
 
+  const handleSignOut = () => {
+    playSound('click');
+    
+    // Clear authentication data but preserve user info
+    localStorage.setItem("isAuthenticated", "false");
+    
+    // We keep the "users" data in localStorage so login can still work
+    // Just clear the current user session data
+    localStorage.removeItem("currentUser");
+    localStorage.removeItem("userName");
+    
+    // Show success toast
+    toast({
+      title: "Signed out",
+      description: "You have been successfully signed out.",
+    });
+    
+    // Redirect to home page
+    navigate("/");
+  };
+
   const navigationItems = [
-    { name: "Dashboard", path: "/", icon: <Home className="w-5 h-5" /> },
-    { name: "Journal", path: "/journal", icon: <SquarePen className="w-5 h-5" /> },
-    { name: "Stats", path: "/stats", icon: <BarChart3 className="w-5 h-5" /> },
-    { name: "Chatbot", path: "/chatbot", icon: <MessageSquareText className="w-5 h-5" /> },
-    { name: "Meditation", path: "/meditation", icon: <Waves className="w-5 h-5" /> },
+    { name: "Dashboard", path: "/dashboard", icon: <Home className="mr-2 w-5 h-5" /> },
+    { name: "Journal", path: "/journal", icon: <SquarePen className="mr-2 w-5 h-5" /> },
+    { name: "Stats", path: "/stats", icon: <BarChart3 className="mr-2 w-5 h-5" /> },
+    { name: "Chatbot", path: "/chatbot", icon: <MessageSquareText className="mr-2 w-5 h-5" /> },
+    { name: "Meditation", path: "/meditation", icon: <Waves className="mr-2 w-5 h-5" /> },
   ];
 
   return (
@@ -41,7 +73,7 @@ const Navbar = () => {
         <div className="flex items-center gap-2">
           <span className="font-semibold text-xl tracking-tight text-foreground">Tranquil Mind</span>
         </div>
-        
+
         <nav className="ml-auto flex items-center gap-2">
           <div className="hidden md:flex items-center gap-6 px-6">
             {navigationItems.map((item) => (
@@ -70,9 +102,21 @@ const Navbar = () => {
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
-              <DropdownMenuItem onSelect={() => playSound('click')}>Profile</DropdownMenuItem>
-              <DropdownMenuItem onSelect={() => playSound('click')}>Settings</DropdownMenuItem>
-              <DropdownMenuItem onSelect={() => playSound('click')}>Sign out</DropdownMenuItem>
+              <DropdownMenuItem disabled className="opacity-70">
+                {userName ? `Signed in as ${userName}` : "Profile"}
+              </DropdownMenuItem>
+              <DropdownMenuItem onSelect={() => {
+                playSound('click');
+                navigate("/dashboard");
+              }}>Dashboard</DropdownMenuItem>
+              <DropdownMenuItem onSelect={() => {
+                playSound('click'); 
+                // Settings functionality would go here
+              }}>Settings</DropdownMenuItem>
+              <DropdownMenuItem onSelect={handleSignOut} className="text-red-500">
+                <LogOut className="mr-2 h-4 w-4" />
+                Sign out
+              </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
           
@@ -108,6 +152,17 @@ const Navbar = () => {
                       {item.name}
                     </Link>
                   ))}
+                  
+                  <Separator className="my-2" />
+                  
+                  <Button 
+                    variant="ghost" 
+                    className="flex justify-start px-2 py-6 h-auto text-red-500 hover:bg-red-500/10 hover:text-red-500"
+                    onClick={handleSignOut}
+                  >
+                    <LogOut className="mr-2 h-5 w-5" />
+                    Sign out
+                  </Button>
                 </div>
               </div>
             </SheetContent>

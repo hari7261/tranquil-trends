@@ -3,7 +3,10 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
+import ProtectedRoute from "./components/ProtectedRoute";
 import HomePage from "./pages/HomePage";
+import LoginPage from "./pages/LoginPage";
+import RegisterPage from "./pages/RegisterPage";
 import Index from "./pages/Index";
 import Journal from "./pages/Journal";
 import JournalNew from "./pages/JournalNew";
@@ -25,18 +28,64 @@ const App = () => (
       <Sonner />
       <BrowserRouter>
         <Routes>
+          {/* Public Routes */}
           <Route path="/" element={<HomePage />} />
-          <Route path="/dashboard" element={<Index />} />
-          <Route path="/journal" element={<Journal />} />
-          <Route path="/journal/new" element={<JournalNew />} />
-          <Route path="/stats" element={<Stats />} />
-          <Route path="/breathing" element={<BreathingExercise />} />
-          <Route path="/mindfulness" element={<MindfulnessCheck />} />
-          <Route path="/reminders" element={<DailyReminder />} />
-          <Route path="/self-care" element={<SelfCare />} />
-          <Route path="/chatbot" element={<Chatbot />} />
-          <Route path="/meditation" element={<MeditationPage />} />
-          {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+          <Route path="/login" element={<LoginPage />} />
+          <Route path="/register" element={<RegisterPage />} />
+          
+          {/* Protected Routes */}
+          <Route path="/dashboard" element={
+            <ProtectedRoute>
+              <Index />
+            </ProtectedRoute>
+          } />
+          <Route path="/journal" element={
+            <ProtectedRoute>
+              <Journal />
+            </ProtectedRoute>
+          } />
+          <Route path="/journal/new" element={
+            <ProtectedRoute>
+              <JournalNew />
+            </ProtectedRoute>
+          } />
+          <Route path="/stats" element={
+            <ProtectedRoute>
+              <Stats />
+            </ProtectedRoute>
+          } />
+          <Route path="/breathing" element={
+            <ProtectedRoute>
+              <BreathingExercise />
+            </ProtectedRoute>
+          } />
+          <Route path="/mindfulness" element={
+            <ProtectedRoute>
+              <MindfulnessCheck />
+            </ProtectedRoute>
+          } />
+          <Route path="/reminders" element={
+            <ProtectedRoute>
+              <DailyReminder />
+            </ProtectedRoute>
+          } />
+          <Route path="/self-care" element={
+            <ProtectedRoute>
+              <SelfCare />
+            </ProtectedRoute>
+          } />
+          <Route path="/chatbot" element={
+            <ProtectedRoute>
+              <Chatbot />
+            </ProtectedRoute>
+          } />
+          <Route path="/meditation" element={
+            <ProtectedRoute>
+              <MeditationPage />
+            </ProtectedRoute>
+          } />
+          
+          {/* Catch-all route */}
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>

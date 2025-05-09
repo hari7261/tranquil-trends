@@ -11,7 +11,8 @@ import {
   Check,
   ChevronRight,
   Sun,
-  Sparkles
+  Sparkles,
+  LogIn
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -28,6 +29,7 @@ const HomePage = () => {
   const navigate = useNavigate();
   const { playSound } = useSound();
   const [currentTestimonial, setCurrentTestimonial] = useState(0);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
   
   // Parallax effect for hero section
   const [scrollY, setScrollY] = useState(0);
@@ -37,6 +39,12 @@ const HomePage = () => {
     };
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  // Check authentication status
+  useEffect(() => {
+    const authStatus = localStorage.getItem("isAuthenticated") === "true";
+    setIsAuthenticated(authStatus);
   }, []);
 
   const testimonials = [
@@ -111,18 +119,6 @@ const HomePage = () => {
               Tranquil Mind
             </span>
           </div>
-          <Button 
-            onClick={() => {
-              playSound('click');
-              navigate("/login");
-            }}
-            onMouseEnter={() => playSound('hover')}
-            variant="ghost"
-            className="hidden sm:flex"
-          >
-            Log In
-            <ChevronRight className="ml-1 h-4 w-4" />
-          </Button>
         </div>
       </header>
 
@@ -147,26 +143,47 @@ const HomePage = () => {
                 className="bg-gradient-to-r from-primary to-purple-600 hover:from-primary/90 hover:to-purple-600/90 text-white shadow-lg shadow-primary/25 group"
                 onClick={() => {
                   playSound('click');
-                  navigate("/dashboard");
+                  if (isAuthenticated) {
+                    navigate("/dashboard");
+                  } else {
+                    navigate("/register");
+                  }
                 }}
                 onMouseEnter={() => playSound('hover')}
               >
-                Get Started
+                {isAuthenticated ? "Go to Dashboard" : "Get Started"}
                 <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
               </Button>
-              <Button
-                size="lg"
-                variant="outline"
-                className="border-primary/20 bg-background/50 backdrop-blur-sm hover:bg-background/80"
-                onClick={() => {
-                  playSound('click');
-                  const featuresSection = document.getElementById('features');
-                  featuresSection?.scrollIntoView({ behavior: 'smooth' });
-                }}
-                onMouseEnter={() => playSound('hover')}
-              >
-                Explore Features
-              </Button>
+              {!isAuthenticated && (
+                <Button
+                  size="lg"
+                  variant="outline"
+                  className="border-primary/20 bg-background/50 backdrop-blur-sm hover:bg-background/80"
+                  onClick={() => {
+                    playSound('click');
+                    navigate("/login");
+                  }}
+                  onMouseEnter={() => playSound('hover')}
+                >
+                  <LogIn className="mr-2 h-4 w-4" />
+                  Sign In
+                </Button>
+              )}
+              {isAuthenticated && (
+                <Button
+                  size="lg"
+                  variant="outline"
+                  className="border-primary/20 bg-background/50 backdrop-blur-sm hover:bg-background/80"
+                  onClick={() => {
+                    playSound('click');
+                    const featuresSection = document.getElementById('features');
+                    featuresSection?.scrollIntoView({ behavior: 'smooth' });
+                  }}
+                  onMouseEnter={() => playSound('hover')}
+                >
+                  Explore Features
+                </Button>
+              )}
             </div>
           </motion.div>
         </div>
@@ -332,11 +349,15 @@ const HomePage = () => {
                   className="bg-white text-primary hover:bg-white/90 shadow-lg group"
                   onClick={() => {
                     playSound('click');
-                    navigate("/dashboard");
+                    if (isAuthenticated) {
+                      navigate("/dashboard");
+                    } else {
+                      navigate("/register");
+                    }
                   }}
                   onMouseEnter={() => playSound('hover')}
                 >
-                  Enter Dashboard
+                  {isAuthenticated ? "Enter Dashboard" : "Create Account"}
                   <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
                 </Button>
               </div>

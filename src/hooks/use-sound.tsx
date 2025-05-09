@@ -1,5 +1,4 @@
-
-import { useCallback, useEffect, useRef } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 
 type SoundType = 'click' | 'success' | 'error' | 'notification' | 'hover' | 'transition' | 'complete';
 
@@ -24,6 +23,8 @@ export const useSound = () => {
     complete: null
   });
 
+  const [userInteracted, setUserInteracted] = useState(false);
+  
   const soundEnabled = useRef<boolean>(
     localStorage.getItem('soundEnabled') === 'false' ? false : true
   );
@@ -37,7 +38,20 @@ export const useSound = () => {
       audioRefs.current[key as SoundType] = audio;
     });
 
+    // Set up interaction detection
+    const handleInteraction = () => setUserInteracted(true);
+    
+    // Add user interaction listeners to enable audio
+    window.addEventListener('click', handleInteraction, { once: true });
+    window.addEventListener('keydown', handleInteraction, { once: true });
+    window.addEventListener('touchstart', handleInteraction, { once: true });
+
     return () => {
+      // Remove listeners
+      window.removeEventListener('click', handleInteraction);
+      window.removeEventListener('keydown', handleInteraction);
+      window.removeEventListener('touchstart', handleInteraction);
+      
       // Cleanup audio elements
       Object.values(audioRefs.current).forEach(audio => {
         if (audio) {
@@ -49,14 +63,25 @@ export const useSound = () => {
   }, []);
 
   const playSound = useCallback((type: SoundType) => {
-    if (!soundEnabled.current) return;
+    if (!soundEnabled.current || !userInteracted) return;
     
     const audio = audioRefs.current[type];
     if (audio) {
-      audio.currentTime = 0;
-      audio.play().catch(e => console.error('Error playing sound:', e));
+      // Reset audio if it's already playing
+      if (!audio.paused) {
+        audio.pause();
+        audio.currentTime = 0;
+      }
+      
+      // Play with error handling
+      audio.play().catch(e => {
+        // Only log errors that aren't related to autoplay restrictions
+        if (!(e.name === 'NotAllowedError' || e.name === 'AbortError')) {
+          console.error('Error playing sound:', e);
+        }
+      });
     }
-  }, []);
+  }, [userInteracted]);
 
   const toggleSound = useCallback(() => {
     soundEnabled.current = !soundEnabled.current;

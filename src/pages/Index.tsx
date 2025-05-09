@@ -12,7 +12,6 @@ import { Bell, Brain, HeartPulse, Sparkles, Wind, BookText } from "lucide-react"
 import { Button } from "@/components/ui/button";
 import { toast } from "@/hooks/use-toast";
 import { Separator } from "@/components/ui/separator";
-import ChatbotInterface from "@/components/ChatbotInterface";
 
 const Index = () => {
   const [showChatbot, setShowChatbot] = useState(false);
@@ -114,17 +113,8 @@ const Index = () => {
           <p className="text-muted-foreground">
             Need someone to talk to? Our AI assistant is here to help.
           </p>
-          <Button 
-            variant="outline" 
-            className="mt-2" 
-            onClick={() => setShowChatbot(true)}
-          >
-            <Sparkles className="mr-2 h-4 w-4" /> Open Mental Health Assistant
-          </Button>
         </section>
       </div>
-      
-      <ChatbotInterface initialOpen={showChatbot} />
     </Layout>
   );
 };
