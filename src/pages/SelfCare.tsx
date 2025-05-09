@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import Layout from "@/components/Layout";
 import { 
@@ -35,25 +34,58 @@ interface SelfCareActivity {
   title: string;
   description: string;
   icon: React.ReactNode;
+  iconType: string; // Add this to keep track of icon type
   durationMinutes: number;
   category: "physical" | "mental" | "emotional" | "social";
   completed: boolean;
 }
 
+// Helper function to render icon based on type
+const renderIcon = (iconType: string) => {
+  switch (iconType) {
+    case "leaf": return <Leaf className="h-6 w-6 text-emerald-500" />;
+    case "coffee": return <Coffee className="h-6 w-6 text-blue-500" />;
+    case "refresh": return <RefreshCcw className="h-6 w-6 text-purple-500" />;
+    case "heart": return <Heart className="h-6 w-6 text-red-500" />;
+    case "utensils": return <Utensils className="h-6 w-6 text-orange-500" />;
+    case "book": return <BookOpen className="h-6 w-6 text-indigo-500" />;
+    case "music": return <Music className="h-6 w-6 text-teal-500" />;
+    case "moon": return <Moon className="h-6 w-6 text-slate-500" />;
+    default: return <Sun className="h-6 w-6 text-amber-500" />;
+  }
+};
+
 const SelfCare = () => {
   const [activities, setActivities] = useState<SelfCareActivity[]>(() => {
     const savedActivities = localStorage.getItem("selfCareActivities");
     if (savedActivities) {
-      return JSON.parse(savedActivities);
+      try {
+        // Parse saved activities and add icon React elements
+        const parsedActivities = JSON.parse(savedActivities);
+        return parsedActivities.map((activity: any) => ({
+          ...activity,
+          icon: renderIcon(activity.iconType)
+        }));
+      } catch (error) {
+        console.error("Error parsing saved activities:", error);
+        // Fall back to default activities if there's an error
+        return getDefaultActivities();
+      }
     }
     
     // Default activities
+    return getDefaultActivities();
+  });
+
+  // Function to get default activities
+  function getDefaultActivities(): SelfCareActivity[] {
     return [
       {
         id: "1",
         title: "Deep Breathing",
         description: "Take 5 minutes to practice deep, mindful breathing",
-        icon: <Leaf className="h-6 w-6 text-emerald-500" />,
+        iconType: "leaf",
+        icon: renderIcon("leaf"),
         durationMinutes: 5,
         category: "mental",
         completed: false
@@ -62,7 +94,8 @@ const SelfCare = () => {
         id: "2",
         title: "Hydration",
         description: "Drink a glass of water and take a moment to be present",
-        icon: <Coffee className="h-6 w-6 text-blue-500" />,
+        iconType: "coffee",
+        icon: renderIcon("coffee"),
         durationMinutes: 2,
         category: "physical",
         completed: false
@@ -71,7 +104,8 @@ const SelfCare = () => {
         id: "3",
         title: "Stretching",
         description: "Gentle stretching to release tension in your body",
-        icon: <RefreshCcw className="h-6 w-6 text-purple-500" />,
+        iconType: "refresh",
+        icon: renderIcon("refresh"),
         durationMinutes: 10,
         category: "physical",
         completed: false
@@ -80,7 +114,8 @@ const SelfCare = () => {
         id: "4",
         title: "Gratitude",
         description: "Write down three things you're grateful for today",
-        icon: <Heart className="h-6 w-6 text-red-500" />,
+        iconType: "heart",
+        icon: renderIcon("heart"),
         durationMinutes: 5,
         category: "emotional",
         completed: false
@@ -89,7 +124,8 @@ const SelfCare = () => {
         id: "5",
         title: "Mindful Eating",
         description: "Eat a snack or meal with full awareness and no distractions",
-        icon: <Utensils className="h-6 w-6 text-orange-500" />,
+        iconType: "utensils",
+        icon: renderIcon("utensils"),
         durationMinutes: 15,
         category: "physical",
         completed: false
@@ -98,7 +134,8 @@ const SelfCare = () => {
         id: "6",
         title: "Reading",
         description: "Read a few pages of an enjoyable book",
-        icon: <BookOpen className="h-6 w-6 text-indigo-500" />,
+        iconType: "book",
+        icon: renderIcon("book"),
         durationMinutes: 15,
         category: "mental",
         completed: false
@@ -107,7 +144,8 @@ const SelfCare = () => {
         id: "7",
         title: "Music Break",
         description: "Listen to calming or uplifting music",
-        icon: <Music className="h-6 w-6 text-teal-500" />,
+        iconType: "music",
+        icon: renderIcon("music"),
         durationMinutes: 10,
         category: "emotional",
         completed: false
@@ -116,25 +154,38 @@ const SelfCare = () => {
         id: "8",
         title: "Digital Detox",
         description: "Take a short break from all electronic devices",
-        icon: <Moon className="h-6 w-6 text-slate-500" />,
+        iconType: "moon",
+        icon: renderIcon("moon"),
         durationMinutes: 30,
         category: "mental",
         completed: false
       }
     ];
-  });
+  }
 
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
 
   // Save activities to localStorage whenever they change
   React.useEffect(() => {
-    localStorage.setItem("selfCareActivities", JSON.stringify(activities));
+    // Create a serializable version of activities without React elements
+    const serializableActivities = activities.map(activity => {
+      // Omit the React element icon property when saving to localStorage
+      const { icon, ...serializableActivity } = activity;
+      return serializableActivity;
+    });
+    
+    localStorage.setItem("selfCareActivities", JSON.stringify(serializableActivities));
   }, [activities]);
 
   const markAsCompleted = (id: string) => {
     const updatedActivities = activities.map(activity => {
       if (activity.id === id) {
-        return { ...activity, completed: !activity.completed };
+        return { 
+          ...activity, 
+          completed: !activity.completed,
+          // Make sure icon is consistent
+          icon: renderIcon(activity.iconType) 
+        };
       }
       return activity;
     });
@@ -155,7 +206,9 @@ const SelfCare = () => {
   const resetActivities = () => {
     const resetActs = activities.map(activity => ({
       ...activity,
-      completed: false
+      completed: false,
+      // Make sure icon is consistent
+      icon: renderIcon(activity.iconType)
     }));
     
     setActivities(resetActs);
@@ -266,7 +319,7 @@ const SelfCare = () => {
           </Button>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 bg-background/50 p-4 rounded-lg">
           {filteredActivities.map((activity) => (
             <Card key={activity.id} className={`transition-all duration-300 ${activity.completed ? 'glass-card-primary' : 'glass-card'} hover:shadow-md`}>
               <CardHeader className="pb-2">
