@@ -1,69 +1,137 @@
-# Welcome to your Lovable project
+# Tranquil Trends
 
-## Project info
+![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)
 
-**URL**: https://lovable.dev/projects/d13fc9b3-74bb-4f68-9210-156e1812706f
+**Tranquil Trends** is a comprehensive mental wellness application designed to help users track, manage, and improve their mental health through evidence-based techniques and interactive tools. With a beautiful, modern UI and a variety of features focused on mindfulness, meditation, mood tracking, and self-care, Tranquil Trends provides a holistic approach to mental wellbeing.
 
-## How can I edit this code?
+![Tranquil Trends Screenshot](https://img.freepik.com/free-vector/mental-health-concept-illustration_114360-818.jpg)
 
-There are several ways of editing your application.
+## ✨ Features
 
-**Use Lovable**
+### 🧘 Meditation
+- Curated audio tracks with different themes and durations
+- Interactive player with progress tracking
+- Session statistics and streak tracking
+- Various meditation styles: ambient, guided, rhythmic, and chants
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/d13fc9b3-74bb-4f68-9210-156e1812706f) and start prompting.
+### 😌 Breathing Exercise
+- Guided breathing exercises based on the 4-7-8 technique
+- Visual animation that expands and contracts to guide breathing
+- Progress tracking and audio cues
+- Educational content about breathing benefits
 
-Changes made via Lovable will be committed automatically to this repo.
+### 🧠 Mindfulness Check
+- Emotion selection with visual representations
+- Guided one-minute mindfulness session
+- Reflection space for documenting thoughts
+- History tracking of previous check-ins
 
-**Use your preferred IDE**
+### ❤️ Mood Tracking
+- Daily mood recording with visual indicators
+- Trend visualization over time
+- Pattern recognition for emotional states
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+### 📝 Journal
+- Create detailed journal entries with titles and content
+- Associate mood indicators with entries
+- Search functionality for easy retrieval
+- Private, local storage for privacy
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+### 🌿 Self-Care Activities
+- Categories: physical, mental, emotional, and social
+- Progress tracking for completed activities
+- Time investment indicators
+- Daily reset functionality
 
-Follow these steps:
+### ⏰ Daily Reminders
+- Customizable reminders for mental health habits
+- Schedule settings for specific days
+- Enable/disable functionality
+- Local storage for privacy
 
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
+### 📊 Statistics and Tracking
+- Comprehensive visualization of mental health data
+- Activity completion tracking
+- Meditation statistics and streaks
+- Charts and graphs for progress monitoring
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
+### 🤖 Mental Health Assistant
+- AI-powered chatbot providing support
+- Coping strategies and resource recommendations
+- Privacy-focused conversation handling
 
-# Step 3: Install the necessary dependencies.
-npm i
+## 🚀 Getting Started
 
-# Step 4: Start the development server with auto-reloading and an instant preview.
-npm run dev
+### Prerequisites
+- [Node.js](https://nodejs.org/) (v14 or later)
+- [npm](https://www.npmjs.com/) or [Bun](https://bun.sh/)
+
+### Installation
+
+1. Clone the repository:
+```bash
+git clone https://github.com/yourusername/tranquil-trends.git
+cd tranquil-trends
 ```
 
-**Edit a file directly in GitHub**
+2. Install dependencies:
+```bash
+npm install
+# or
+bun install
+```
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+3. Start the development server:
+```bash
+npm run dev
+# or
+bun run dev
+```
 
-**Use GitHub Codespaces**
+4. Open your browser and navigate to `http://localhost:5173`
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+## 🛠️ Built With
 
-## What technologies are used for this project?
+- **React** - Core UI library
+- **TypeScript** - For type safety and improved developer experience
+- **React Router** - Client-side routing
+- **TanStack Query** - Data fetching and state management
+- **Tailwind CSS** - Utility-first styling
+- **Shadcn UI** - Component library built on Radix UI
+- **Recharts** - Data visualization
+- **Web Audio API** - Sound features
+- **localStorage** - Client-side data persistence
+- **Vite** - Build tool and development server
 
-This project is built with .
+## 🔒 Privacy First
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+Tranquil Trends prioritizes your privacy:
+- All data stays on your device using browser localStorage
+- No user accounts or personal data collection
+- No external APIs (except for the optional chatbot)
+- Transparent data usage
 
-## How can I deploy this project?
+## 🤝 Contributing
 
-Simply open [Lovable](https://lovable.dev/projects/d13fc9b3-74bb-4f68-9210-156e1812706f) and click on Share -> Publish.
+Contributions are welcome! Please feel free to submit a Pull Request.
 
-## I want to use a custom domain - is that possible?
+1. Fork the project
+2. Create your feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add some amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
 
-We don't support custom domains (yet). If you want to deploy your project under your own domain then we recommend using Netlify. Visit our docs for more details: [Custom domains](https://docs.lovable.dev/tips-tricks/custom-domain/)
+## 📄 License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## 🙏 Acknowledgments
+
+- All the open-source libraries and tools used in this project
+- The mental health community for inspiration and guidance
+- [Shadcn UI](https://ui.shadcn.com/) for the beautiful component library
+- Icon libraries for the visual elements
+
+---
+
+Built with ❤️ for mental wellbeing.
